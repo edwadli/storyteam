@@ -1,0 +1,24 @@
+
+
+h1 storyteam
+div.joinRoom
+    form
+        span Room 
+        input#txtRoomName(type="text")
+        br
+        input#btnJoinRoom(type="submit")
+    p.errorMessage
+
+script.
+    // join room
+    var txtRoomName = $('#txtRoomName');
+    txtRoomName.focus();
+    $('div.joinRoom form').submit(function(){
+        socket.emit('join room', txtRoomName.val());
+        return false;
+    });
+    socket.on('join room result', function(msg){
+        $('div.maincontent').html(msg);
+    });
+
+

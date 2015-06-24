@@ -1,0 +1,50 @@
+
+include mixins/chat
+include mixins/storybuilder
+include mixins/userlist
+
+style.
+    html, body {
+        height: 100%; width: 100%; margin: 0;
+    }
+    div.maincontent {
+        height: 90%; width: 90%;
+    }
+    div.container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    div.storybuilding {
+        float: left;
+        width: 50%;
+        padding-left: 10%;
+        height: 90%;
+        padding-top: 5%;
+    }
+    div.sidechat {
+        float: right;
+        width: 19%;
+        height: 90%;
+        padding-top: 5%;
+    }
+    div.userlist {
+        float:right;
+        width: 10%;
+        padding-right: 10%;
+        height: 90%;
+        padding-top 5%;
+    }
+
+h1!= roomName
+
+div.container
+    div.storybuilding
+        +storybuilder(roomName)
+    div.sidechat
+        +chat(roomName)
+    div.userlist
+        +userlist(roomName)
+        
+script.
+

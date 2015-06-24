@@ -1,0 +1,49 @@
+
+extends ./layout.jade
+
+block header
+    title!= title
+
+block content
+    h1!= message
+    div.joinRoom
+        form(action="")
+            span Room Name 
+            input#txtRoomName(type="text")
+            br
+            input#btnRoomJoin(type="submit")
+        p.errorMessage
+
+block scripts
+    script.
+        var socket = io();
+        var txtRoomName = $("#txtRoomName");
+
+        // TODO: create new room vs find room
+        $("div.joinRoom form").submit(function(){
+            // get server permission
+            socket.emit('join room', txtRoomName.val());
+            return false;
+        });
+        
+        socket.on('join room', function(msg){
+            if (!(msg === "true")){
+                return;
+            }
+            $.ajax({
+                url: "/join_room",
+                data: {id: txtRoomName.val()},
+                type: 'POST',
+                success: function (data){
+                    // redirect
+                    window.location = data;
+                },
+                error: function(){
+                    $("p.errorMessage").html("Invalid Room");
+                },
+                complete: function(){
+                    txtRoomName.val("");
+                }
+            });
+        });
+            

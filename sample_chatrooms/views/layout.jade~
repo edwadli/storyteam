@@ -1,0 +1,11 @@
+//- main layout
+
+doctype html
+html
+    head
+        block header
+            title Story Team
+    body
+        block content
+
+script(src="")
