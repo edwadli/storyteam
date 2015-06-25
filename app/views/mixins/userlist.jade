@@ -1,0 +1,29 @@
+
+
+mixin userlist(roomName)
+    style.
+        div.hiddenroomtitle{display:none; }
+        div.userlist {
+            border 1px solid black;
+        }
+    
+    div.hiddenroomtitle= roomName
+    div.userlist
+        h1 hello
+
+    script.
+
+        alert('asdf');
+        // populate user list
+        socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
+        socket.on("user list", function(data){
+            %('div.userlist').html(data);
+        });
+        // refresh whever a user leaves or joins
+        socket.on("user left", function(data){
+            socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
+        });
+        socket.on("user joined", function(data){
+            socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
+        });
+
