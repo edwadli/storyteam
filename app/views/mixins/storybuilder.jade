@@ -1,0 +1,58 @@
+
+mixin storybuilder(roomName)
+    style.
+        div.hiddenroomtitle{ display:none; }
+        div.storybuilder {
+            height: 100%;
+        }
+        div.storylog{
+            height: 90%;
+            width: 100%;
+            overflow-y: scroll;
+            border: 1px solid black;
+        }
+        div.story {
+            width: 100%;
+            word-wrap: break-word;
+        }
+        p.storyErrorMessage {
+            font-size: 0.5em;
+        }
+
+    div.hiddenroomtitle= roomName
+    div.storybuilder
+        div.storylog
+            div.story
+        div.storyinput
+            form
+                input#txtStory(type="text", autocomplete="off")
+                button#btnStory(type="submit") >
+            p.storyErrorMessage
+
+    script.
+
+        // story
+        socket.emit("refresh story", {roomName: $('div.hiddenroomtitle').html()});
+        var txtStory = $('#txtStory');
+        $('div.storyinput form').submit(function() {
+            socket.emit('story',
+                {msg: txtStory.val(),
+                roomName: $('div.hiddenroomtitle').html()}
+            );
+            $('p.storyErrorMessage').html("");
+            return false;
+        });
+        socket.on('story',function(msg){
+            if (msg.err === null){
+                $('p.errorMessage').html("");
+                $('div.story').html(msg.story);
+                $('div.storylog').scrollTop($('div.storylog').height());
+            }
+            else {
+                $('p.errorMessage').html(msg.err);
+            }
+            txtStory.val("");
+            txtStory.focus();
+        });
+
+

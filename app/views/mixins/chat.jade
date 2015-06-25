@@ -1,0 +1,68 @@
+
+mixin chat(roomName)
+    style.
+        div.hiddenroomtitle{
+            display: none;
+        }
+        div.chat {
+            height:100%;
+        }
+        div.chatlog{
+            height: 80%;
+            width: 100%;
+            overflow-y: scroll;
+            border: 1px solid black;
+        }
+        div.chatinput{
+            width: 100%;
+            border: 1px solid black;
+            white-space: nowrap;
+        }
+        #txtChat{
+            width: 89%;
+        }
+        #btnChat{
+            width: 9%;
+            height:100%;
+        }
+        #messages { list-style-type: none; margin: 0; padding: 0; }
+        #messages li {padding: 5px 10px; word-wrap: break-word;}
+        #messages li:nth-child(odd) { background: #eee; }
+
+    div.hiddenroomtitle= roomName
+    div.chat
+        div.chatlog
+            ul(id="messages")
+        div.chatinput
+            form
+                input#txtChat(type="text", autocomplete="off")
+                button#btnChat(type="submit") >
+        p.errorMessage
+
+    script.
+
+        // chat
+        var txtChat = $('#txtChat');
+        $('div.chatinput form').submit(function() {
+            socket.emit('chat',
+                {msg: txtChat.val(),
+                roomName: $('div.hiddenroomtitle').html()}
+            );
+            return false;
+        });
+        socket.on('chat', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            txtChat.val("");
+            txtChat.focus();
+            $('div.chatlog').scrollTop($('div.chatlog').height());
+        });
+        socket.on('user left', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            $('div.chatlog').scrollTop($('div.chatlog').height());
+        });
+        socket.on('user joined', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            $('div.chatlog').scrollTop($('div.chatlog').height());
+        })
+
+

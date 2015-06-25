@@ -1,0 +1,21 @@
+
+
+extends ./layout.jade
+
+block header
+    title!= id
+
+block content
+    h1!= id
+    ul(id="messages")
+    div.chatBox
+        form
+            input#txtChat(type="text")
+            input#btnChat(type="submit")
+        p.errorMessage
+
+block scripts
+    script.
+        var socket = io();
+        
+

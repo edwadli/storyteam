@@ -1,0 +1,35 @@
+
+
+mixin userslist(roomName)
+    style.
+        div.hiddenroomtitle{display:none; }
+        div.userslist {
+            height:80%;
+            width: 100%;
+            overflow-y: scroll;
+        }
+        #presentUsers { list-style-type: none; margin: 0; padding: 0;  }
+        #presentUsers li {padding: 5px 10px; word-wrap: break-word;} 
+        #presentUsers li:nth-child(odd) { background: #eee; }
+    
+    div.hiddenroomtitle= roomName
+    div.userslist
+        ul(id="presentUsers")
+
+    script.
+        // populate user list
+        socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
+        socket.on("user list", function(data){
+            $('#presentUsers').html("");
+            for (var i=0; i<data.length; i++) {
+                $('#presentUsers').append($('<li>').text(data[i]));
+            }
+        });
+        // refresh whever a user leaves or joins
+        socket.on("user left", function(data){
+            socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
+        });
+        socket.on("user joined", function(data){
+            socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
+        });
+

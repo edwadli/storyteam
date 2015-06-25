@@ -1,0 +1,39 @@
+
+extends ./layout.jade
+
+block header
+    title storyteam
+    style.
+        div.maincontent {
+            position: relative;
+        }
+
+block content
+    div.maincontent
+        h1 storyteam
+        div.login
+            form
+                span Nickname 
+                input#txtUsername(type="text")
+                br
+                input#btnSubmitUser(type="submit")
+            p.errorMessage
+
+block scripts
+    script.
+        var socket = io();
+
+        // login
+        var txtUsername = $('#txtUsername');
+        txtUsername.focus();
+        $('div.login form').submit(function() {
+            socket.emit('login', txtUsername.val());
+            return false;
+        });
+        socket.on('login result', function(msg){
+            $('div.maincontent').html(msg);
+        });
+
+        
+
+
