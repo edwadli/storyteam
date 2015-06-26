@@ -21,6 +21,7 @@ mixin storybuilder(roomName)
 
     div.hiddenroomtitle= roomName
     div.storybuilder
+        div.storyTurn
         div.storylog
             div.story
         div.storyinput
@@ -45,6 +46,7 @@ mixin storybuilder(roomName)
         socket.on('story',function(msg){
             if (msg.err === null){
                 $('p.errorMessage').html("");
+                $('div.storyTurn').html(msg.turn);
                 $('div.story').html(msg.story);
                 $('div.storylog').scrollTop($('div.storylog').height());
             }
@@ -53,6 +55,11 @@ mixin storybuilder(roomName)
             }
             txtStory.val("");
             txtStory.focus();
+        });
+        socket.on('user left', function(){
+            // update who's turn display
+            // TODO: refactor to separate getWhoseTurn from 'refresh story'
+            socket.emit("refresh story", {roomName: $('div.hiddenroomtitle').html()});
         });
 
 

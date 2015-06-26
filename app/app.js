@@ -34,7 +34,7 @@ io.on('connection', function(client){
     client.on("join room", function(name){
         // TODO: dont automatically create new room if room doesnt exist
         if (name.length === 0) return; // TODO: dont just fail silently
-        if (!(name in rooms)) rooms[name] = {story: "", options: defaultOptions};
+        if (!(name in rooms)) rooms[name] = {story: "", options: defaultOptions, turn: 0};
         client.join(name);
         io.to(name).emit("user joined", users[client.id].name+" has joined");
         client.emit("join room result", jade.renderFile('./views/room.jade',
@@ -62,24 +62,65 @@ io.on('connection', function(client){
 
     // story building
     client.on("story", function(data){
-        // make sure room is one of client's rooms
-        if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
-        // TODO: check for turn
         // TODO: make this secure by using socket.id instead of name
         
-        // enforce rules of the game before accepting msg
-        var errMsg = isInvalidPlay(data.msg, rooms[data.roomName].options);
+        // make sure room is one of client's rooms
+        if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
+        // TODO: maintain internal list of players in room instead
+        //      of relying on socketio list
+        // TODO: fix turn ordering when user(s) leave in the middle
+        var room = io.sockets.adapter.rooms[data.roomName];
+        var userslist = [];
+        for (var user in room){
+            userslist.push(user);
+        }
+
+        var turn = (rooms[data.roomName].turn);
+        if (turn >= userslist.length) {
+            //note room only exists if has atleast one player
+            turn = 0;
+            rooms[data.roomName].turn = 0;
+        }
+
+        var errMsg;
+        // check turn
+        if (userslist[turn] === client.id) {
+            // enforce rules of the game before accepting msg
+            errMsg = isInvalidPlay(data.msg, rooms[data.roomName].options);
+        }
+        else {
+            errMsg = "Not your turn";
+        }
         if (errMsg === null){
             addToStory(data.msg, data.roomName);
-            // TODO: update turn
+            // update turn
+            rooms[data.roomName].turn = (turn+1)%(userslist.length);
         }
-        io.to(data.roomName).emit("story", {err: errMsg, story: rooms[data.roomName].story});
+        io.to(data.roomName).emit("story",
+            {
+                err: errMsg,
+                story: rooms[data.roomName].story,
+                turn: (users[userslist[(rooms[data.roomName]).turn]]).name
+            }
+        );
     });
 
     client.on("refresh story", function(data){
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
-        io.to(data.roomName).emit("story", rooms[data.roomName].story);
+        var userslist = [];
+        for (var user in io.sockets.adapter.rooms[data.roomName]){
+            userslist.push(users[user].name);
+        }
+        var room = rooms[data.roomName];
+        var turn = (rooms[data.roomName].turn);
+        if (turn >= userslist.length) {
+            //note room only exists if has atleast one player
+            turn = 0;
+            rooms[data.roomName].turn = 0;
+        }
+        io.to(data.roomName).emit("story", 
+            {err: null, story: room.story, turn: userslist[turn]});
     });
 
  
