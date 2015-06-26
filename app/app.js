@@ -27,7 +27,7 @@ io.on('connection', function(client){
     client.on("login", function(name){
         // allow for same name
         users[client.id] = {name: name};
-        client.emit("login result", jade.renderFile('./views/selectRoom.jade'));
+        client.emit("login result", jade.renderFile(__dirname+'/views/selectRoom.jade'));
     });
 
     // join room
@@ -37,7 +37,7 @@ io.on('connection', function(client){
         if (!(name in rooms)) rooms[name] = {story: "", options: defaultOptions, turn: 0};
         client.join(name);
         io.to(name).emit("user joined", users[client.id].name+" has joined");
-        client.emit("join room result", jade.renderFile('./views/room.jade',
+        client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
                 {roomName: name}));
     });
 
