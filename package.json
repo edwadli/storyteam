@@ -4,7 +4,7 @@
   "description": "let's build a story together",
   "main": "app/app.js",
   "scripts": {
-      "start": "nodejs app/app.js"
+      "start": "node app/app.js"
   },
   "dependencies": {
     "express": "~4.10.2",
