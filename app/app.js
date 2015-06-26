@@ -152,8 +152,8 @@ io.on('connection', function(client){
 
 
 // start server
-http.listen(process.env.PORT || 8080, function(){
-    console.log('listening on *:8080');
+http.listen(process.env.PORT || 3000, function(){
+    console.log('listening on *:3000');
 });
 
 
