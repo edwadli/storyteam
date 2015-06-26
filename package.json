@@ -2,7 +2,6 @@
   "name": "storyteam",
   "version": "0.0.1",
   "description": "let's build a story together",
-  "main": "app/app.js",
   "scripts": {
       "start": "node app/app.js"
   },
