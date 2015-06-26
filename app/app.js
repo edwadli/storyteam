@@ -1,7 +1,7 @@
 
 
 var app = require('express')();
-app.set('views', './views');
+app.set('views', __dirname+'/views');
 app.set('view engine', 'jade');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
