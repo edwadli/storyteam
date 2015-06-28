@@ -32,3 +32,11 @@ TODO: make sure server is sending minimal required information; make it
 user-friendly on client side.
 TODO: separate style sheets and scripts from jade html
 
+TODO: style sheets
+
+TODO: vote undo
+TODO: vote kick user
+
+TODO: list of rooms on room selection page (after login page)
+
+
