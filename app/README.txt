@@ -15,6 +15,8 @@ set rules)
 Basic Gameplay Aesthetics
 TODO: assign colors to users
 TODO: keep track of who made what contribution in the story (eg, by color)
+TODO: notify user turn (sound+flashing)
+
 
 Login/Joining
 TODO: list of rooms on room selection page (after login page)
@@ -42,6 +44,6 @@ TODO: timeout before skip turn
 TODO: ending/starting input with punctuation input with punctuation
 TODO: display story contribution tracking
 TODO: allow/disallow new users after start (if we have a pre-start page)
-
+TODO: max players
 
 
