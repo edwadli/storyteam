@@ -1,14 +1,19 @@
 
-
+// express
 var app = require('express')();
+// jade
 app.set('views', __dirname+'/views');
 app.set('view engine', 'jade');
+var jade = require('jade');
+// utils
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// socketio
 var http = require('http').Server(app);
-var jade = require('jade');
 var io = require('socket.io')(http);
+// models
+var Room = require(__dirname+'/models/Room.js');
 
 var users = {};
 var rooms = {};
@@ -33,8 +38,8 @@ io.on('connection', function(client){
     // join room
     client.on("join room", function(name){
         // TODO: dont automatically create new room if room doesnt exist
-        if (name.length === 0) return; // TODO: dont just fail silently
-        if (!(name in rooms)) rooms[name] = {story: "", options: defaultOptions, turn: 0};
+        if (name.length === 0) return; // TODO: client side validation
+        if (!(name in rooms)) rooms[name] = new Room();
         client.join(name);
         io.to(name).emit("user joined", users[client.id].name+" has joined");
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',

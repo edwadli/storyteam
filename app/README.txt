@@ -36,6 +36,7 @@ validate but not return error messages for user)
 TODO: make sure server is sending minimal required information; make it
 user-friendly on client side.
 TODO: separate style sheets and scripts from jade html
+TODO: refactor app.js
 
 
 Gameplay Options

@@ -53,8 +53,6 @@ mixin storybuilder(roomName)
             }
             else {
                 $('p.errorMessage').html(msg.err);
-                // TODO: do validation before sending
-                txtStory.val(msg.lastmsg);
             }
             txtStory.focus();
         });
