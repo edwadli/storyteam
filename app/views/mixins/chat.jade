@@ -31,6 +31,9 @@ mixin chat(roomName)
 
     div.hiddenroomtitle= roomName
     div.chat
+        div.chatsettings
+            form
+                button#btnClear clear chat
         div.chatlog
             ul(id="messages")
         div.chatinput
@@ -48,13 +51,13 @@ mixin chat(roomName)
                 {msg: txtChat.val(),
                 roomName: $('div.hiddenroomtitle').html()}
             );
+            txtChat.val("");
             return false;
         });
         socket.on('chat', function(msg){
             $('#messages').append($('<li>').text(msg));
-            txtChat.val("");
             txtChat.focus();
-            $('div.chatlog').scrollTop($('div.chatlog').height());
+            $('div.chatlog').scrollTop($('#messages').height());
         });
         socket.on('user left', function(msg){
             $('#messages').append($('<li>').text(msg));
@@ -63,6 +66,11 @@ mixin chat(roomName)
         socket.on('user joined', function(msg){
             $('#messages').append($('<li>').text(msg));
             $('div.chatlog').scrollTop($('div.chatlog').height());
-        })
+        });
+        $('#btnClear').click(function() {
+            $('#messages').html("");
+            return false;
+        });
+
 
 

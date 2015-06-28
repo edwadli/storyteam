@@ -45,6 +45,8 @@ io.on('connection', function(client){
     client.on("chat", function(data){
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
+        // don't allow empty messages
+        if (data.msg === '') return;
         io.to(data.roomName).emit('chat', users[client.id].name+": "+data.msg);
     });
 
@@ -100,7 +102,9 @@ io.on('connection', function(client){
             {
                 err: errMsg,
                 story: rooms[data.roomName].story,
-                turn: (users[userslist[(rooms[data.roomName]).turn]]).name
+                turn: (users[userslist[(rooms[data.roomName]).turn]]).name,
+                // TODO: do client side validation instead of returning this
+                lastmsg: data.msg
             }
         );
     });

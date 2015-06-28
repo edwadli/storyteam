@@ -41,19 +41,21 @@ mixin storybuilder(roomName)
                 roomName: $('div.hiddenroomtitle').html()}
             );
             $('p.storyErrorMessage').html("");
+            txtStory.val("");
             return false;
         });
         socket.on('story',function(msg){
             if (msg.err === null){
                 $('p.errorMessage').html("");
-                $('div.storyTurn').html(msg.turn);
+                $('div.storyTurn').html(msg.turn+"'s turn");
                 $('div.story').html(msg.story);
-                $('div.storylog').scrollTop($('div.storylog').height());
+                $('div.storylog').scrollTop($('div.story').height());
             }
             else {
                 $('p.errorMessage').html(msg.err);
+                // TODO: do validation before sending
+                txtStory.val(msg.lastmsg);
             }
-            txtStory.val("");
             txtStory.focus();
         });
         socket.on('user left', function(){
