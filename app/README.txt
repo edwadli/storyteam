@@ -4,12 +4,13 @@ Basic Gameplay Functionality
 TODO: maintain turns and check for turn during story message
 TODO: vote undo story update
 TODO: vote kick user
+TODO: vote skip user turn (maybe after timeout)
 TODO: prevent spam by continuous long strings (but still allow for
 potentially made-up words/ other languages/ proper nouns).
 
 
 Basic Gameplay Aesthetics
-TODO: assign users colors
+TODO: assign colors to users
 TODO: keep track of who made what contribution in the story (eg, by color)
 
 
