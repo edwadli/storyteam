@@ -19,7 +19,7 @@ TODO: notify user turn (sound+flashing)
 
 
 Login/Joining
-TODO: list of rooms on room selection page (after login page)
+TODO: allow click selection for room selection
 TODO: option for private room
 TODO: unique users/passwords
 

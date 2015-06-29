@@ -9,16 +9,39 @@ div.joinRoom
         input#btnJoinRoom(type="submit")
     p.errorMessage
 
+div.roomList
+    h4 Rooms
+    p(id='roomlistmsg') 
+    button#btnRefreshRooms refresh list
+    ul(id="rooms")
+
 script.
     // join room
     var txtRoomName = $('#txtRoomName');
     txtRoomName.focus();
+    socket.emit("rooms list");
+    $('#btnRefreshRooms').click(function(){
+        socket.emit("rooms list");
+        return false;
+    });
     $('div.joinRoom form').submit(function(){
         socket.emit('join room', txtRoomName.val());
         return false;
     });
     socket.on('join room result', function(msg){
         $('div.maincontent').html(msg);
+    });
+    socket.on("rooms list", function(rooms){
+        $('#rooms').html("");
+        if (rooms.length === 0) {
+            $('#roomlistmsg').html('No rooms - start your own!');
+        }
+        else {
+            $('#roomlistmsg').html("");
+        }
+        for (var i=0; i<rooms.length; i++){
+            $('#rooms').append($('<li>').text(rooms[i]));
+        }
     });
 
 

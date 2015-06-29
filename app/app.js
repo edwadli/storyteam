@@ -132,6 +132,10 @@ io.on('connection', function(client){
             {err: null, story: room.story, turn: userslist[turn]});
     });
 
+    client.on("rooms list", function(){
+        io.emit("rooms list", Object.keys(rooms));
+    });
+
  
     // modification to socket library for onclose events
     client.onclose = function(reason){
