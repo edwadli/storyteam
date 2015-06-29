@@ -65,6 +65,7 @@ io.on('connection', function(client){
     client.on("user list", function(data){
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
+        // TODO: return users in order of turns
         var room = io.sockets.adapter.rooms[data.roomName];
         var userslist = [];
         for (var user in room) {
