@@ -46,5 +46,6 @@ TODO: ending/starting input with punctuation input with punctuation
 TODO: display story contribution tracking
 TODO: allow/disallow new users after start (if we have a pre-start page)
 TODO: max players
-
+TODO: more modes: iambic pentameter, rhyming, non-alphabetic languages (eg,
+chinese), limerick, etc...
 
