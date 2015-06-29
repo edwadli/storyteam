@@ -1,7 +1,6 @@
 
 
 Basic Gameplay Functionality
-TODO: maintain turns and check for turn during story message
 TODO: vote undo story update
 TODO: vote kick user
 TODO: vote skip user turn (maybe after timeout)
@@ -20,6 +19,7 @@ TODO: notify user turn (sound+flashing)
 
 Login/Joining
 TODO: allow click selection for room selection
+TODO: allow for leaving current room
 TODO: option for private room
 TODO: unique users/passwords
 

@@ -14,6 +14,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 // models
 var Room = require(__dirname+'/models/Room.js');
+var User = require(__dirname+'/models/User.js');
 
 var users = {};
 var rooms = {};
@@ -31,7 +32,7 @@ io.on('connection', function(client){
     // new user join
     client.on("login", function(name){
         // allow for same name
-        users[client.id] = {name: name};
+        users[client.id] = new User(client.id, name);
         client.emit("login result", jade.renderFile(__dirname+'/views/selectRoom.jade'));
     });
 
@@ -39,7 +40,12 @@ io.on('connection', function(client){
     client.on("join room", function(name){
         // TODO: dont automatically create new room if room doesnt exist
         if (name.length === 0) return; // TODO: client side validation
-        if (!(name in rooms)) rooms[name] = new Room();
+        if (!(name in rooms)) rooms[name] = new Room(name);
+        var user = users[client.id];
+        var room = rooms[name];
+        room.addUser(user);
+        user.joinRoom(room);
+        // attach room to client
         client.join(name);
         io.to(name).emit("user joined", users[client.id].name+" has joined");
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
@@ -73,25 +79,11 @@ io.on('connection', function(client){
         
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
-        // TODO: maintain internal list of players in room instead
-        //      of relying on socketio list
-        // TODO: fix turn ordering when user(s) leave in the middle
-        var room = io.sockets.adapter.rooms[data.roomName];
-        var userslist = [];
-        for (var user in room){
-            userslist.push(user);
-        }
-
-        var turn = (rooms[data.roomName].turn);
-        if (turn >= userslist.length) {
-            //note room only exists if has atleast one player
-            turn = 0;
-            rooms[data.roomName].turn = 0;
-        }
-
+        
+        var room = rooms[data.roomName];
         var errMsg;
         // check turn
-        if (userslist[turn] === client.id) {
+        if (room.whoseTurn().id === client.id) {
             // enforce rules of the game before accepting msg
             errMsg = isInvalidPlay(data.msg, rooms[data.roomName].options);
         }
@@ -99,15 +91,15 @@ io.on('connection', function(client){
             errMsg = "Not your turn";
         }
         if (errMsg === null){
+            room.nextTurn();
             addToStory(data.msg, data.roomName);
             // update turn
-            rooms[data.roomName].turn = (turn+1)%(userslist.length);
         }
         io.to(data.roomName).emit("story",
             {
                 err: errMsg,
                 story: rooms[data.roomName].story,
-                turn: (users[userslist[(rooms[data.roomName]).turn]]).name,
+                turn: rooms[data.roomName].whoseTurn().name,
                 // TODO: do client side validation instead of returning this
                 lastmsg: data.msg
             }
@@ -117,19 +109,9 @@ io.on('connection', function(client){
     client.on("refresh story", function(data){
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
-        var userslist = [];
-        for (var user in io.sockets.adapter.rooms[data.roomName]){
-            userslist.push(users[user].name);
-        }
         var room = rooms[data.roomName];
-        var turn = (rooms[data.roomName].turn);
-        if (turn >= userslist.length) {
-            //note room only exists if has atleast one player
-            turn = 0;
-            rooms[data.roomName].turn = 0;
-        }
         io.to(data.roomName).emit("story", 
-            {err: null, story: room.story, turn: userslist[turn]});
+            {err: null, story: room.story, turn: room.whoseTurn().name});
     });
 
     client.on("rooms list", function(){
@@ -146,16 +128,19 @@ io.on('connection', function(client){
     disconnect_cb = function(client){
         if (client.id in users)
             try {
-                var name = users[client.id].name;
-                delete users[client.id];
-                for (var i=0; i<client.rooms.length; i++){
-                    io.to(client.rooms[i]).emit('user left', name+' has left');
-                    var room = io.sockets.adapter.rooms[client.rooms[i]];
-                    if (Object.keys(room).length === 1)
+                var user = users[client.id];
+                for (var i=0; i<user.rooms.length; i++){
+                    var room = user.rooms[i]; 
+                    room.removeUser(user.id);
+                    io.to(room.name).emit('user left', user.name+' has left');
+                    if (Object.keys(room.users).length === 0)
                     {
-                        delete rooms[client.rooms[i]];
+                        delete rooms[room.name];
                     }
                 }
+                // remove from users list
+                delete users[client.id];
+
             }
             catch (e) {
                 console.log(e);
