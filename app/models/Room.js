@@ -1,4 +1,6 @@
 
+var Story = require(__dirname+"/Story.js");
+
 var nodemethod = TurnNode.prototype;
 function TurnNode(user) {
     this.user = user;
@@ -11,7 +13,7 @@ var method = Room.prototype;
 
 function Room(name) {
     this.name = name;
-    this.story = "";
+    this.story = new Story();
     this.options = {maxWords: 3};
     this.turn = null;
     this.users = {};
