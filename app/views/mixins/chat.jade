@@ -57,6 +57,7 @@ mixin chat(roomName)
         socket.on('chat', function(msg){
             $('#messages').append($('<li>').text(msg));
             txtChat.focus();
+            chatNotification(msg);
             $('div.chatlog').scrollTop($('#messages').height());
         });
         socket.on('user left', function(msg){
@@ -71,6 +72,26 @@ mixin chat(roomName)
             $('#messages').html("");
             return false;
         });
+
+        var chatNotification = function(message){
+            var options = {body: message};
+
+            if(!("Notification" in window)){
+                console.log("This browser does not support desktop notifications.");
+            }
+            else if(Notification.permission === "granted"){
+                var notification = new Notification("New message - StoryTeam", options);
+            }
+
+            else if(Notification.permission !== "denied"){ //ask for permission
+                Notification.requestPermission(function(permission){
+                    if(permission === "granted"){
+                        var notification = new Notification("New message - StoryTeam", options);
+                    }
+                })
+            }
+
+        };
 
 
 

@@ -9,6 +9,7 @@ potentially made-up words/ other languages/ proper nouns).
 TODO: pre-start page to wait for everyone to join the room?
 TODO: let users set rules (maybe assign host for each room and only let host
 set rules)
+TODO: prevent chat notification for user's own sent chats
 
 
 Basic Gameplay Aesthetics
