@@ -70,7 +70,6 @@ io.on('connection', function(client){
     client.on("user list", function(data){
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
-        // TODO: return users in order of turns
         var room = rooms[data.roomName];
         io.to(data.roomName).emit('user list',room.getUsers());
     });
@@ -92,13 +91,13 @@ io.on('connection', function(client){
         }
         if (errMsg === null){
             room.nextTurn();
-            addToStory(data.msg, data.roomName);
+            room.story.addToStory(data.msg, client.id);
             // update turn
         }
         io.to(data.roomName).emit("story",
             {
                 err: errMsg,
-                story: rooms[data.roomName].story,
+                story: rooms[data.roomName].story.text,
                 turn: rooms[data.roomName].whoseTurn().name,
                 // TODO: do client side validation instead of returning this
                 lastmsg: data.msg
@@ -111,7 +110,7 @@ io.on('connection', function(client){
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit("story", 
-            {err: null, story: room.story, turn: room.whoseTurn().name});
+            {err: null, story: room.story.text, turn: room.whoseTurn().name});
     });
 
     client.on("rooms list", function(){
@@ -213,14 +212,5 @@ function isEndingPunct(str){
     return /^[.,!?;:)>'"]+$/.test(str);
 }
 
-
-function addToStory(msg,roomName){
-    if (isAlphaWithPunct(msg[0]) || isAlphaWithPunct(msg.substr(0,2))
-        || isNumericWithPunct(msg[0]) || isNumericWithPunct(msg.substr(0,2)))
-        msg = ' '+msg;
-    if (msg[msg.length-1] === ' ')
-        msg = msg.substr(0,msg.length-1);
-    rooms[roomName].story += msg;
-}
 
 

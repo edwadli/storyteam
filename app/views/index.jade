@@ -29,6 +29,8 @@ block scripts
         txtUsername.focus();
         $('div.login form').submit(function() {
             socket.emit('login', txtUsername.val());
+            // TODO: only set this if login successful
+            socket.name = txtUsername.val();
             return false;
         });
         socket.on('login result', function(msg){
