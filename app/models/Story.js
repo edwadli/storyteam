@@ -7,7 +7,7 @@ function Story() {
 }
 
 
-method.addToStory(msg){
+method.addToStory = function(msg){
     if (isAlphaWithPunct(msg[0]) || isAlphaWithPunct(msg.substr(0,2))
         || isNumericWithPunct(msg[0]) || isNumericWithPunct(msg.substr(0,2)))
         msg = ' '+msg;

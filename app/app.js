@@ -1,7 +1,8 @@
 
 // express
-var express = require('express')
+var express = require('express');
 var app = express();
+app.use('/resources', express.static(__dirname + '/resources'));
 // jade
 app.set('views', __dirname+'/views');
 app.set('view engine', 'jade');
@@ -16,14 +17,12 @@ var io = require('socket.io')(http);
 // models
 var Room = require(__dirname+'/models/Room.js');
 var User = require(__dirname+'/models/User.js');
+var Story = require(__dirname+'/models/Story.js');
 
 var users = {};
 var rooms = {};
 //TODO: changeable options for the game
 var defaultOptions = {maxWords: 3};
-
-
-app.use('/resources', express.static(__dirname+'/resources'));
 
 // main page
 app.get('/', function(req,res){
@@ -148,7 +147,6 @@ io.on('connection', function(client){
             }
     };
 });
-
 
 
 // start server
