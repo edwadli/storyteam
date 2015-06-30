@@ -1,4 +1,8 @@
 
+style.
+    .availableRooms:hover {
+        cursor: pointer;
+    }
 
 h1 storyteam
 div.joinRoom
@@ -40,7 +44,11 @@ script.
             $('#roomlistmsg').html("");
         }
         for (var i=0; i<rooms.length; i++){
-            $('#rooms').append($('<li>').text(rooms[i]));
+            $('#rooms').append($('<li>').text(rooms[i])
+                .addClass('availableRooms')
+                .click(function(){
+                    socket.emit('join room', $(this).html());
+                }));
         }
     });
 

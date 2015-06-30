@@ -69,6 +69,16 @@ method.prevTurn = function() {
     this.turn = this.users[this.turn].prev.user.id;
 };
 
+method.getUsers = function() {
+    var list = [];
+    var curr_id = this.turn;
+    for (var i=0; i<Object.keys(this.users).length; i++){
+        list.push(this.users[curr_id].user.name);
+        curr_id = this.users[curr_id].next.user.id;
+    }
+    return list;
+}
+
 module.exports = Room;
 
 

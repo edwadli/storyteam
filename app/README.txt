@@ -18,7 +18,6 @@ TODO: notify user turn (sound+flashing)
 
 
 Login/Joining
-TODO: allow click selection for room selection
 TODO: allow for leaving current room
 TODO: option for private room
 TODO: unique users/passwords

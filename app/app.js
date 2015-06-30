@@ -65,12 +65,9 @@ io.on('connection', function(client){
     client.on("user list", function(data){
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
-        var room = io.sockets.adapter.rooms[data.roomName];
-        var userslist = [];
-        for (var user in room) {
-            userslist.push(users[user].name);
-        }
-        io.to(data.roomName).emit('user list',userslist);
+        // TODO: return users in order of turns
+        var room = rooms[data.roomName];
+        io.to(data.roomName).emit('user list',room.getUsers());
     });
 
     // story building
