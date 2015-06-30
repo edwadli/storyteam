@@ -48,6 +48,7 @@ io.on('connection', function(client){
         // attach room to client
         client.join(name);
         io.to(name).emit("user joined", users[client.id].name+" has joined");
+        // TODO: pass a secret room id instead of room name
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
                 {roomName: name}));
     });
@@ -72,8 +73,6 @@ io.on('connection', function(client){
 
     // story building
     client.on("story", function(data){
-        // TODO: make this secure by using socket.id instead of name
-        
         // make sure room is one of client's rooms
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
         

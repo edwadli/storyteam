@@ -15,6 +15,8 @@ Basic Gameplay Aesthetics
 TODO: assign colors to users
 TODO: keep track of who made what contribution in the story (eg, by color)
 TODO: notify user turn (sound+flashing)
+TODO: embed story input box to current story text position
+TODO: add indicator of who's turn on users list
 
 
 Login/Joining
