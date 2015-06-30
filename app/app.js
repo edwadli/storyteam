@@ -59,7 +59,8 @@ io.on('connection', function(client){
         if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
         // don't allow empty messages
         if (data.msg === '') return;
-        io.to(data.roomName).emit('chat', users[client.id].name+": "+data.msg);
+        client.broadcast.to(data.roomName).emit('chat',
+            {name: users[client.id].name, msg: data.msg});
     });
 
     // users in the room

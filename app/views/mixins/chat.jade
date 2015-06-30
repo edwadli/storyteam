@@ -47,14 +47,20 @@ mixin chat(roomName)
         // chat
         var txtChat = $('#txtChat');
         $('div.chatinput form').submit(function() {
+            var msg = txtChat.val();
+            // don't allow empty submissions
+            if (msg.length === 0) return false;
             socket.emit('chat',
-                {msg: txtChat.val(),
+                {msg: msg,
                 roomName: $('div.hiddenroomtitle').html()}
             );
             txtChat.val("");
+            // TODO:confirm that the chat was received by server
+            $('#messages').append($('<li>').text(msg));
             return false;
         });
-        socket.on('chat', function(msg){
+        socket.on('chat', function(data){
+            var msg = data.name+": "+data.msg;
             $('#messages').append($('<li>').text(msg));
             txtChat.focus();
             chatNotification(msg);
