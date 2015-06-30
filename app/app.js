@@ -1,6 +1,7 @@
 
 // express
-var app = require('express')();
+var express = require('express')
+var app = express();
 // jade
 app.set('views', __dirname+'/views');
 app.set('view engine', 'jade');
@@ -20,6 +21,9 @@ var users = {};
 var rooms = {};
 //TODO: changeable options for the game
 var defaultOptions = {maxWords: 3};
+
+
+app.use('/resources', express.static(__dirname+'/resources'));
 
 // main page
 app.get('/', function(req,res){
@@ -143,6 +147,7 @@ io.on('connection', function(client){
             }
     };
 });
+
 
 
 // start server

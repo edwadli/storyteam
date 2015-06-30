@@ -42,6 +42,8 @@ mixin chat(roomName)
                 button#btnChat(type="submit") >
         p.errorMessage
 
+    audio#notificationSound(src = "/resources/blop_sound.mp3")
+
     script.
 
         // chat
@@ -81,12 +83,16 @@ mixin chat(roomName)
             }
             else if(Notification.permission === "granted"){
                 var notification = new Notification("New message - StoryTeam", options);
+                var sound = document.getElementById('notificationSound');
+                console.log(sound);
+                sound.play();
             }
 
             else if(Notification.permission !== "denied"){ //ask for permission
                 Notification.requestPermission(function(permission){
                     if(permission === "granted"){
                         var notification = new Notification("New message - StoryTeam", options);
+                        document.getElementById('notificationSound').play();
                     }
                 })
             }
