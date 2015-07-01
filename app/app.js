@@ -35,8 +35,9 @@ io.on('connection', function(client){
     // new user join
     client.on("login", function(name){
         // allow for same name
-        users[client.id] = new User(client.id, name);
-        client.emit("validate user", {name: users[client.id].name});
+        var user = new User(client.id, name);
+        users[client.id] = user;
+        client.emit("validate user", {name: user.name, publicid: user.publicid });
         client.emit("login result", jade.renderFile(__dirname+'/views/selectRoom.jade'));
     });
 
@@ -82,12 +83,12 @@ io.on('connection', function(client){
         if (!(data.roomName in users[client.id].rooms)) return;
         
         var room = rooms[data.roomName];
-        var errMsg = room.userSubmission(client.id, data.msg);
+        var errMsg = room.userSubmission(users[client.id], data.msg);
 
         if (errMsg === null){
             io.to(data.roomName).emit("story",
                 {
-                    story: rooms[data.roomName].story.text,
+                    story: rooms[data.roomName].story.continuations,
                     turn: rooms[data.roomName].whoseTurn().name
                 }
             );
@@ -97,14 +98,16 @@ io.on('connection', function(client){
         }
     });
 
+    // story refresh
     client.on("refresh story", function(data){
         // make sure room is one of client's rooms
         if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit("story", 
-            {story: room.story.text, turn: room.whoseTurn().name});
+            {story: room.story.continuations, turn: room.whoseTurn().name});
     });
 
+    // get rooms
     client.on("rooms list", function(){
         io.emit("rooms list", Object.keys(rooms));
     });

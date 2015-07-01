@@ -47,7 +47,7 @@ mixin storybuilder(roomName)
         socket.on('story',function(data){
             $('p.errorMessage').html("");
             $('div.storyTurn').html(data.turn+"'s turn");
-            $('div.story').html(data.story);
+            $('div.story').html(constructStoryHtml(data.story));
             $('div.storylog').scrollTop($('div.story').height());
         });
         socket.on('user left', function(){
@@ -58,5 +58,22 @@ mixin storybuilder(roomName)
         socket.on('story error', function(data){
             $('p.errorMessage').html(data.msg);
         });
+
+        var constructStoryHtml = function (continuations){
+            var storyHtml = $('<div>').addClass('storyText');
+            var colors = ['#999966','white'];
+            for (var i=0; i<continuations.length; i++){
+                var entry = continuations[i];
+                storyHtml.append(
+                $('<span>')
+                    .html(entry.text)
+                    .addClass(entry.author.id)
+                    .attr('title', entry.author.name)
+                    // TODO: use assigned user colors
+                    .css('background-color',colors[i%2] )
+                );
+            }
+            return storyHtml.get(0);
+        };
 
 

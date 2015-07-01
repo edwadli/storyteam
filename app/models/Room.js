@@ -81,16 +81,16 @@ method.getUsers = function() {
     return list;
 };
 
-method.userSubmission = function(userid, submission){
+method.userSubmission = function(user, submission){
     // check turn
     var errMsg = "Not your turn";
-    if (this.whoseTurn().id === userid){
+    if (this.whoseTurn().id === user.id){
         // check rules of the game
         errMsg = isInvalidPlay(submission, this.options);
         // apply update to story
         if (errMsg === null) {
             this.nextTurn();
-            this.story.addToStory(submission, userid);
+            this.story.addToStory(submission, {id: user.publicid, name: user.name});
         }
     }
     return errMsg;
