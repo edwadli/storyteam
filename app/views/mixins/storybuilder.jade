@@ -45,16 +45,13 @@ mixin storybuilder(roomName)
             return false;
         });
         socket.on('story',function(data){
+            // reset error message
             $('p.errorMessage').html("");
-            $('div.storyTurn').html(data.turn+"'s turn");
+
             $('div.story').html(constructStoryHtml(data.story));
             $('div.storylog').scrollTop($('div.story').height());
         });
-        socket.on('user left', function(){
-            // update who's turn display
-            // TODO: refactor to separate getWhoseTurn from 'refresh story'
-            socket.emit("refresh story", {roomName: $('div.hiddenroomtitle').html()});
-        });
+
         socket.on('story error', function(data){
             $('p.errorMessage').html(data.msg);
         });

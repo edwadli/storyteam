@@ -13,11 +13,9 @@ set rules)
 
 Basic Gameplay Aesthetics
 TODO: assign colors to users
-TODO: keep track of who made what contribution in the story (eg, by color)
+TODO: add notifications to 'user turn' event (in room.jade)
+TODO: keep track of who made what contribution in the story (eg, by user color)
 TODO: embed story input box to current story text position
-TODO: add indicator of who's turn on users list
-TODO: add notification for when it's user's turn (chat notifs have been
-implemented)
 
 
 

@@ -18,6 +18,7 @@ var io = require('socket.io')(http);
 var Room = require(__dirname+'/models/Room.js');
 var User = require(__dirname+'/models/User.js');
 var Story = require(__dirname+'/models/Story.js');
+var PublicUser = require(__dirname+'/models/PublicUser.js');
 
 var users = {};
 var rooms = {};
@@ -75,6 +76,7 @@ io.on('connection', function(client){
         if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit('user list',room.getUsers());
+        io.to(data.roomName).emit('user turn', new PublicUser(room.whoseTurn()));
     });
 
     // story building
@@ -86,12 +88,13 @@ io.on('connection', function(client){
         var errMsg = room.userSubmission(users[client.id], data.msg);
 
         if (errMsg === null){
-            io.to(data.roomName).emit("story",
+            io.to(room.name).emit("story",
                 {
                     story: rooms[data.roomName].story.continuations,
-                    turn: rooms[data.roomName].whoseTurn().name
+                    turn: new PublicUser(rooms[data.roomName].whoseTurn())
                 }
             );
+            io.to(room.name).emit("user turn", new PublicUser(room.whoseTurn()));
         }
         else {
             client.emit('story error', {msg: errMsg});
@@ -104,7 +107,11 @@ io.on('connection', function(client){
         if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit("story", 
-            {story: room.story.continuations, turn: room.whoseTurn().name});
+            {
+                story: room.story.continuations,
+                turn: new PublicUser(room.whoseTurn())
+            }
+        );
     });
 
     // get rooms
@@ -126,6 +133,7 @@ io.on('connection', function(client){
             for (var key in user.rooms){
                 if (!(user.rooms.hasOwnProperty(key))) continue;
                 var room = user.rooms[key];
+                io.to(room.name).emit('user turn', new PublicUser(room.whoseTurn()));
                 room.removeUser(user.id);
                 io.to(room.name).emit('user left', {name: user.name});
                 if (Object.keys(room.users).length === 0)

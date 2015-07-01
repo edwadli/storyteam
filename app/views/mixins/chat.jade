@@ -95,7 +95,6 @@ mixin chat(roomName)
             else if(Notification.permission === "granted"){
                 var notification = new Notification("New message - StoryTeam", options);
                 var sound = document.getElementById('notificationSound');
-                console.log(sound);
                 sound.play();
             }
 

@@ -28,6 +28,7 @@ style.
         width: 15%;
         height: 90%;
     }
+    
 
 
 div.container
@@ -38,5 +39,22 @@ div.container
         +userslist(roomName)
     div.sidechat
         +chat(roomName)
-        
 
+style.
+    
+    .hasTurn {
+        /* TODO: stop using !important */
+        background-color: green !important;
+    }
+
+script.
+
+    socket.on('user turn', function(data){
+        $('div.storyTurn').html(data.name+"'s turn")
+            .addClass(data.publicid);
+        // set turn icon on userslist
+        $('#presentUsers li').removeClass('hasTurn');
+        var userElem = $('#presentUsers li.'+data.publicid);
+        userElem.addClass('hasTurn');
+        // TODO: add notifications here
+    });

@@ -11,6 +11,8 @@ mixin userslist(roomName)
         #presentUsers { list-style-type: none; margin: 0; padding: 0;  }
         #presentUsers li {padding: 5px 10px; word-wrap: break-word;} 
         #presentUsers li:nth-child(odd) { background: #eee; }
+
+
     
     div.hiddenroomtitle= roomName
     div.userstitle users
@@ -18,12 +20,20 @@ mixin userslist(roomName)
         ul(id="presentUsers")
 
     script.
+        var users = {};
         // populate user list
         socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
         socket.on("user list", function(data){
+            users = {};
             $('#presentUsers').html("");
             for (var i=0; i<data.length; i++) {
-                $('#presentUsers').append($('<li>').text(data[i]));
+                var name = data[i].name;
+                var pid = data[i].publicid;
+                $('#presentUsers').append($('<li>')
+                    .text(data[i].name)
+                    .addClass(data[i].publicid)
+                );
+                users[pid] = name;
             }
         });
         // refresh whever a user leaves or joins
