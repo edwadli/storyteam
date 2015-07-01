@@ -29,6 +29,8 @@ script.
         return false;
     });
     $('div.joinRoom form').submit(function(){
+        // don't allow empty strings for room
+        if (txtRoomName.val().length === 0) return false;
         socket.emit('join room', txtRoomName.val());
         return false;
     });

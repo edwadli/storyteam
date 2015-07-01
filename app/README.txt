@@ -25,10 +25,7 @@ TODO: unique users/passwords
 
 
 Security
-TODO: onconnection assign user a password (eg some hash); on join room
-assign user a pasword. Check these two before executing any user-initiated
-server-side action. (currently it only checks for name of user and room to
-validate identity.)
+
 
 Optimization
 TODO: add client-side validation and error messages (server should still

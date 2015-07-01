@@ -42,7 +42,7 @@ io.on('connection', function(client){
     // join room
     client.on("join room", function(name){
         // TODO: dont automatically create new room if room doesnt exist
-        if (name.length === 0) return; // TODO: client side validation
+        if (name.length === 0) return;
         if (!(name in rooms)) rooms[name] = new Room(name);
         var user = users[client.id];
         var room = rooms[name];
@@ -51,25 +51,26 @@ io.on('connection', function(client){
         // attach room to client
         client.join(name);
         io.to(name).emit("user joined", users[client.id].name+" has joined");
-        // TODO: pass a secret room id instead of room name
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
                 {roomName: name}));
     });
 
     // side chat
     client.on("chat", function(data){
-        // make sure room is one of client's rooms
-        if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
         // don't allow empty messages
         if (data.msg === '') return;
+        var user = users[client.id];
+        // make sure room is one of client's rooms
+        if (!(data.roomName in users[client.id].rooms)) return;
         client.broadcast.to(data.roomName).emit('chat',
-            {name: users[client.id].name, msg: data.msg});
+            {name: user.name, msg: data.msg});
+        client.emit('self chat', {name: users[client.id].name, msg: data.msg});
     });
 
     // users in the room
     client.on("user list", function(data){
         // make sure room is one of client's rooms
-        if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
+        if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit('user list',room.getUsers());
     });
@@ -77,7 +78,7 @@ io.on('connection', function(client){
     // story building
     client.on("story", function(data){
         // make sure room is one of client's rooms
-        if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
+        if (!(data.roomName in users[client.id].rooms)) return;
         
         var room = rooms[data.roomName];
         var errMsg;
@@ -107,7 +108,7 @@ io.on('connection', function(client){
 
     client.on("refresh story", function(data){
         // make sure room is one of client's rooms
-        if (!(client.rooms.indexOf(data.roomName) >= 0)) return;
+        if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit("story", 
             {err: null, story: room.story.text, turn: room.whoseTurn().name});
@@ -128,8 +129,9 @@ io.on('connection', function(client){
         if (client.id in users)
             try {
                 var user = users[client.id];
-                for (var i=0; i<user.rooms.length; i++){
-                    var room = user.rooms[i]; 
+                for (var key in user.rooms){
+                    if (!(user.rooms.hasOwnProperty(key))) continue;
+                    var room = user.rooms[key];
                     room.removeUser(user.id);
                     io.to(room.name).emit('user left', user.name+' has left');
                     if (Object.keys(room.users).length === 0)
