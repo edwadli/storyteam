@@ -72,11 +72,13 @@ mixin chat(roomName)
             txtChat.focus();
             $('div.chatlog').scrollTop($('#messages').height());
         });
-        socket.on('user left', function(msg){
+        socket.on('user left', function(data){
+            var msg = data.name+" has left";
             $('#messages').append($('<li>').text(msg));
             $('div.chatlog').scrollTop($('div.chatlog').height());
         });
-        socket.on('user joined', function(msg){
+        socket.on('user joined', function(data){
+            var msg = data.name+" has joined";
             $('#messages').append($('<li>').text(msg));
             $('div.chatlog').scrollTop($('div.chatlog').height());
         });

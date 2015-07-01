@@ -4,7 +4,7 @@ Basic Gameplay Functionality
 TODO: vote undo story update
 TODO: vote kick user
 TODO: vote skip user turn (maybe after timeout)
-TODO: prevent spam by continuous long strings (but still allow for
+TODO: prevent spam by long strings (but still allow for
 potentially made-up words/ other languages/ proper nouns).
 TODO: pre-start page to wait for everyone to join the room?
 TODO: let users set rules (maybe assign host for each room and only let host
@@ -28,12 +28,7 @@ Security
 
 
 Optimization
-TODO: add client-side validation and error messages (server should still
-validate but not return error messages for user)
-TODO: make sure server is sending minimal required information; make it
-user-friendly on client side.
 TODO: separate style sheets and scripts from jade html
-TODO: refactor app.js
 
 
 Gameplay Options

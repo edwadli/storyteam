@@ -79,8 +79,90 @@ method.getUsers = function() {
         curr_id = this.users[curr_id].next.user.id;
     }
     return list;
-}
+};
+
+method.userSubmission = function(userid, submission){
+    // check turn
+    var errMsg = "Not your turn";
+    if (this.whoseTurn().id === userid){
+        // check rules of the game
+        errMsg = isInvalidPlay(submission, this.options);
+        // apply update to story
+        if (errMsg === null) {
+            this.nextTurn();
+            this.story.addToStory(submission, userid);
+        }
+    }
+    return errMsg;
+};
 
 module.exports = Room;
+
+
+
+
+
+
+
+
+
+
+function isInvalidPlay(msg, opt) {
+    // check if msg is a valid play
+    
+    // TODO: make this changeable options from client
+    // TODO: make this more sophisticated
+    //var tokens = msg.split(/( )/);
+    if (msg.length === 0) return "Empty string";
+    if (msg[0] === ' ') msg = msg.substr(1);
+    if (msg[msg.length-1] === ' ') msg = msg.substr(0,msg.length-1);
+    var tokens = msg.split(" ");
+    var count = 0;
+    for (var i=0; i<tokens.length; i++){
+        var token = tokens[i];
+        //if (token.length === 0) continue;
+        if (!isAlphaWithPunct(token) && !isNumericWithPunct(token)
+                && !isEndingPunct(token))
+            return "Invalid token";
+        else if (isEndingPunct(token))
+            continue;
+        else
+            count++;
+    }
+    // TODO: incorporate user options
+    // max N words
+    if (!(count <= opt.maxWords)) {
+        return "Too many tokens";
+    }
+    // check if final word has ending punct
+    var last = tokens[tokens.length-1];
+    var lastchar = last[last.length-1];
+    if (isEndingPunct(lastchar))
+        return "Cannot end with punctuation";
+
+    // if msg is valid, return null
+    return null;
+}
+
+function isAlphaWithPunct(str) {
+    return /^[(<'"]*[a-zA-Z&'-]+[.,!?;:)>'"]*$/.test(str);
+}
+
+function isNumericWithPunct(str) {
+    return /^[$-]*[0-9-,.:]+$/.test(str);
+}
+
+function isAlpha(str) {
+    return /^[a-zA-Z]+$/.test(str);
+}
+
+function isNumeric(str) {
+    return /^[0-9]+$/.test(str);
+}
+
+function isEndingPunct(str){
+    return /^[.,!?;:)>'"]+$/.test(str);
+}
+
 
 

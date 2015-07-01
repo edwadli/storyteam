@@ -36,6 +36,7 @@ io.on('connection', function(client){
     client.on("login", function(name){
         // allow for same name
         users[client.id] = new User(client.id, name);
+        client.emit("validate user", {name: users[client.id].name});
         client.emit("login result", jade.renderFile(__dirname+'/views/selectRoom.jade'));
     });
 
@@ -50,7 +51,7 @@ io.on('connection', function(client){
         user.joinRoom(room);
         // attach room to client
         client.join(name);
-        io.to(name).emit("user joined", users[client.id].name+" has joined");
+        io.to(name).emit("user joined", {name: users[client.id].name});
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
                 {roomName: name}));
     });
@@ -81,29 +82,19 @@ io.on('connection', function(client){
         if (!(data.roomName in users[client.id].rooms)) return;
         
         var room = rooms[data.roomName];
-        var errMsg;
-        // check turn
-        if (room.whoseTurn().id === client.id) {
-            // enforce rules of the game before accepting msg
-            errMsg = isInvalidPlay(data.msg, rooms[data.roomName].options);
+        var errMsg = room.userSubmission(client.id, data.msg);
+
+        if (errMsg === null){
+            io.to(data.roomName).emit("story",
+                {
+                    story: rooms[data.roomName].story.text,
+                    turn: rooms[data.roomName].whoseTurn().name
+                }
+            );
         }
         else {
-            errMsg = "Not your turn";
+            client.emit('story error', {msg: errMsg});
         }
-        if (errMsg === null){
-            room.nextTurn();
-            room.story.addToStory(data.msg, client.id);
-            // update turn
-        }
-        io.to(data.roomName).emit("story",
-            {
-                err: errMsg,
-                story: rooms[data.roomName].story.text,
-                turn: rooms[data.roomName].whoseTurn().name,
-                // TODO: do client side validation instead of returning this
-                lastmsg: data.msg
-            }
-        );
     });
 
     client.on("refresh story", function(data){
@@ -111,7 +102,7 @@ io.on('connection', function(client){
         if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         io.to(data.roomName).emit("story", 
-            {err: null, story: room.story.text, turn: room.whoseTurn().name});
+            {story: room.story.text, turn: room.whoseTurn().name});
     });
 
     client.on("rooms list", function(){
@@ -126,26 +117,23 @@ io.on('connection', function(client){
     };
     // leaving (using customized disconnect event)
     disconnect_cb = function(client){
-        if (client.id in users)
-            try {
-                var user = users[client.id];
-                for (var key in user.rooms){
-                    if (!(user.rooms.hasOwnProperty(key))) continue;
-                    var room = user.rooms[key];
-                    room.removeUser(user.id);
-                    io.to(room.name).emit('user left', user.name+' has left');
-                    if (Object.keys(room.users).length === 0)
-                    {
-                        delete rooms[room.name];
-                    }
+        if (client.id in users) {
+            var user = users[client.id];
+            // remove user from rooms
+            for (var key in user.rooms){
+                if (!(user.rooms.hasOwnProperty(key))) continue;
+                var room = user.rooms[key];
+                room.removeUser(user.id);
+                io.to(room.name).emit('user left', {name: user.name});
+                if (Object.keys(room.users).length === 0)
+                {
+                    // remove room if user was last in the room
+                    delete rooms[room.name];
                 }
-                // remove from users list
-                delete users[client.id];
-
             }
-            catch (e) {
-                console.log(e);
-            }
+            // remove user from users list
+            delete users[client.id];
+        }
     };
 });
 
@@ -154,65 +142,5 @@ io.on('connection', function(client){
 http.listen(process.env.PORT || 3000, function(){
     console.log('listening on *:3000');
 });
-
-
-
-function isInvalidPlay(msg, opt) {
-    // check if msg is a valid play
-    
-    // TODO: make this changeable options from client
-    // TODO: make this more sophisticated
-    //var tokens = msg.split(/( )/);
-    if (msg.length === 0) return "Empty string";
-    if (msg[0] === ' ') msg = msg.substr(1);
-    if (msg[msg.length-1] === ' ') msg = msg.substr(0,msg.length-1);
-    var tokens = msg.split(" ");
-    var count = 0;
-    for (var i=0; i<tokens.length; i++){
-        var token = tokens[i];
-        //if (token.length === 0) continue;
-        if (!isAlphaWithPunct(token) && !isNumericWithPunct(token)
-                && !isEndingPunct(token))
-            return "Invalid token";
-        else if (isEndingPunct(token))
-            continue;
-        else
-            count++;
-    }
-    // TODO: incorporate user options
-    // max N words
-    if (!(count <= opt.maxWords)) {
-        return "Too many tokens";
-    }
-    // check if final word has ending punct
-    var last = tokens[tokens.length-1];
-    var lastchar = last[last.length-1];
-    if (isEndingPunct(lastchar))
-        return "Cannot end with punctuation";
-
-    // if msg is valid, return null
-    return null;
-}
-
-function isAlphaWithPunct(str) {
-    return /^[(<'"]*[a-zA-Z&'-]+[.,!?;:)>'"]*$/.test(str);
-}
-
-function isNumericWithPunct(str) {
-    return /^[$-]*[0-9-,.:]+$/.test(str);
-}
-
-function isAlpha(str) {
-    return /^[a-zA-Z]+$/.test(str);
-}
-
-function isNumeric(str) {
-    return /^[0-9]+$/.test(str);
-}
-
-function isEndingPunct(str){
-    return /^[.,!?;:)>'"]+$/.test(str);
-}
-
 
 
