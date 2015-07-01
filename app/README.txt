@@ -16,6 +16,9 @@ TODO: assign colors to users
 TODO: keep track of who made what contribution in the story (eg, by color)
 TODO: embed story input box to current story text position
 TODO: add indicator of who's turn on users list
+TODO: add notification for when it's user's turn (chat notifs have been
+implemented)
+
 
 
 Login/Joining
@@ -41,4 +44,8 @@ TODO: max players
 TODO: more modes: iambic pentameter, rhyming, non-alphabetic languages (eg,
 chinese), limerick, sentence, everyone plays (where people vote on their
 favorite continuation each turn) etc...
+
+
+Other:
+favicon.ico
 
