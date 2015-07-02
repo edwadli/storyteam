@@ -34,8 +34,7 @@ block scripts
             $('div.maincontent').html(msg);
         });
         socket.on('validate user', function(data){
-            socket.name = data.name;
-            socket.publicid = data.publicid;
+            socket.user = data;
         });
 
         

@@ -5,6 +5,7 @@ function User(id, name) {
     this.id = id;
     this.publicid = "Z"+Date.now()+Math.floor(Math.random()*1000000).toString(36);
     this.name = name;
+    this.color = null;
     this.rooms = {};
 }
 

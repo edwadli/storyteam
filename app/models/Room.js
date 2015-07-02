@@ -1,5 +1,6 @@
 
 var Story = require(__dirname+"/Story.js");
+var PublicUser = require(__dirname+"/PublicUser.js");
 
 var nodemethod = TurnNode.prototype;
 function TurnNode(user) {
@@ -17,9 +18,28 @@ function Room(name) {
     this.options = {maxWords: 3};
     this.turn = null;
     this.users = {};
+    this.color_iterator = this.ColorIterator();
+}
+
+method.ColorIterator = function(){
+    var color_index = 0;
+    var colors = {'red': '#E57373','blue': '#64B5F6','green': '#81C784',
+        'orange': '#FFB74D','brown': '#A1887F','pink': '#F06292',
+        'purple': '#BA68C8','deep_purple': '#9575CD',
+        'indigo': '#7986CB','light_blue': '#4FC3F7','cyan': '#4DD0E1',
+        'teal': '#4DB6AC','light_green': '#AED581','lime': '#DCE775',
+        'yellow': '#FFF176','amber': '#FFD54F','deep_orange': '#FF8A65',
+        'blue_grey': '#90A4AE'};
+    var colors_list = Object.keys(colors).map(function(key){return colors[key];});
+    return {
+        next: function() {
+            return colors_list[color_index++%colors_list.length];
+        }
+    }
 }
 
 method.addUser = function(user) {
+    user.color = this.color_iterator.next();
     if (Object.keys(this.users).length === 0){
         this.users[user.id] = new TurnNode(user);
         this.turn = user.id;
@@ -47,14 +67,12 @@ method.removeUser = function(userId) {
         if (this.turn === userId) {
             this.nextTurn();
         }
-
         var oldNode = this.users[userId];
         // link up prev and next nodes
         var prevNode = oldNode.prev;
         var nextNode = oldNode.next;
         prevNode.next = nextNode;
         nextNode.prev = prevNode;
-
     }
     
     // get rid of user entry
@@ -76,7 +94,7 @@ method.getUsers = function() {
     var curr_id = this.turn;
     for (var i=0; i<Object.keys(this.users).length; i++){
         var user = this.users[curr_id].user;
-        list.push({name: user.name, publicid: user.publicid });
+        list.push(user);
         curr_id = this.users[curr_id].next.user.id;
     }
     return list;
@@ -91,7 +109,7 @@ method.userSubmission = function(user, submission){
         // apply update to story
         if (errMsg === null) {
             this.nextTurn();
-            this.story.addToStory(submission, {id: user.publicid, name: user.name});
+            this.story.addToStory(submission, user);
         }
     }
     return errMsg;

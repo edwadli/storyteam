@@ -38,7 +38,7 @@ io.on('connection', function(client){
         // allow for same name
         var user = new User(client.id, name);
         users[client.id] = user;
-        client.emit("validate user", {name: user.name, publicid: user.publicid });
+        client.emit("validate user", new PublicUser(user));
         client.emit("login result", jade.renderFile(__dirname+'/views/selectRoom.jade'));
     });
 
@@ -56,6 +56,7 @@ io.on('connection', function(client){
         io.to(name).emit("user joined", {name: users[client.id].name});
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
                 {roomName: name}));
+        client.emit("update user", new PublicUser(user));
     });
 
     // side chat
@@ -75,7 +76,7 @@ io.on('connection', function(client){
         // make sure room is one of client's rooms
         if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
-        io.to(data.roomName).emit('user list',room.getUsers());
+        io.to(data.roomName).emit('user list',room.getUsers().map(function(user){return new PublicUser(user);}));
         io.to(data.roomName).emit('user turn', new PublicUser(room.whoseTurn()));
     });
 

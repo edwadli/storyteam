@@ -32,7 +32,8 @@ style.
 
 
 div.container
-    h1!= roomName
+    h1(id='roomTitle', data-room!=roomName)!= roomName
+    h3(id='titleAuthors')
     div.storybuilding
         +storybuilder(roomName)
     div.users
@@ -40,21 +41,44 @@ div.container
     div.sidechat
         +chat(roomName)
 
-style.
-    
-    .hasTurn {
-        /* TODO: stop using !important */
-        background-color: green !important;
-    }
 
 script.
 
+    socket.on('update user', function(data){
+        socket.user = data;
+    });
+    socket.on('user list', function(data){
+        var authors = $('#titleAuthors');
+        authors.html('by ').append(
+            $('<span>')
+            .addClass(socket.user.publicid)
+            .css('background-color', socket.user.color)
+            .text(socket.user.name)
+        );
+        for (var i=0; i<data.length; i++){
+            var user = data[i];
+            if (user.publicid === socket.user.publicid){
+                continue;
+            }
+            authors.append(', ');
+            authors.append(
+                $('<span>')
+                .addClass(user.publicid)
+                .css('background-color', user.color)
+                .text(user.name)
+            );
+        }
+    });
+
     socket.on('user turn', function(data){
-        $('div.storyTurn').html(data.name+"'s turn")
-            .addClass(data.publicid);
+        $('div.storyTurn').html('');
+        $('div.storyTurn').append(
+            $('<span>').addClass(data.publicid)
+            .css('background-color', data.color)
+            .text(data.name+"'s turn")
+        );
         // set turn icon on userslist
-        $('#presentUsers li').removeClass('hasTurn');
-        var userElem = $('#presentUsers li.'+data.publicid);
-        userElem.addClass('hasTurn');
+        $('#presentUsers li div.turnIcon').removeClass('hasTurn');
+        $('#presentUsers li.'+data.publicid+' div.turnIcon').addClass('hasTurn');
         // TODO: add notifications here
     });

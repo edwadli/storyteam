@@ -5,6 +5,9 @@ mixin storybuilder(roomName)
         div.storybuilder {
             height: 100%;
         }
+        div.storyTurn{
+            width:20%;
+        }
         div.storylog{
             height: 90%;
             width: 100%;
@@ -19,7 +22,7 @@ mixin storybuilder(roomName)
             font-size: 0.5em;
         }
 
-    div.hiddenroomtitle= roomName
+    div(class='hiddenroomtitle',data-room!=roomName)= roomName
     div.storybuilder
         div.storyTurn
         div.storylog
@@ -33,7 +36,7 @@ mixin storybuilder(roomName)
     script.
 
         // story
-        socket.emit("refresh story", {roomName: $('div.hiddenroomtitle').html()});
+        socket.emit("refresh story", {roomName: $('div.hiddenroomtitle').data('room')});
         var txtStory = $('#txtStory');
         $('div.storyinput form').submit(function() {
             socket.emit('story',
@@ -64,10 +67,10 @@ mixin storybuilder(roomName)
                 storyHtml.append(
                 $('<span>')
                     .html(entry.text)
-                    .addClass(entry.author.id)
+                    .addClass(entry.author.publicid)
                     .attr('title', entry.author.name)
                     // TODO: use assigned user colors
-                    .css('background-color',colors[i%2] )
+                    .css('background-color', entry.author.color )
                 );
             }
             return storyHtml.get(0);
