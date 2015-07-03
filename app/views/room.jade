@@ -75,10 +75,13 @@ script.
         $('div.storyTurn').append(
             $('<span>').addClass(data.publicid)
             .css('background-color', data.color)
-            .text(data.name+"'s turn")
-        );
+            .text(data.name)
+        ).append("'s turn");
         // set turn icon on userslist
         $('#presentUsers li div.turnIcon').removeClass('hasTurn');
         $('#presentUsers li.'+data.publicid+' div.turnIcon').addClass('hasTurn');
         // TODO: add notifications here
     });
+
+
+
