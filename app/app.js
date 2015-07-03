@@ -22,6 +22,7 @@ var PublicUser = require(__dirname+'/models/PublicUser.js');
 
 var users = {};
 var rooms = {};
+
 //TODO: changeable options for the game
 var defaultOptions = {maxWords: 3};
 
@@ -118,6 +119,53 @@ io.on('connection', function(client){
     // get rooms
     client.on("rooms list", function(){
         io.emit("rooms list", Object.keys(rooms));
+    });
+
+    var vote_submission = function(data, onMajority){
+        var user = data.user;
+        var room = data.room;
+        room.getPoll(data.voteType).submitVote(user, true);
+        if (room.getPoll(data.voteType).hasMajority()){
+            onMajority();
+        }
+        io.to(room.name).emit(data.voteType,
+            {votes: room.getPoll(data.voteType).numAyes(),
+                total: room.getPoll(data.voteType).numMajority()});
+    };
+    // vote
+    client.on('vote skip turn', function(data){
+        data = {
+            user: users[client.id],
+            room: rooms[data.roomName],
+            voteType: data.voteType
+        };
+        vote_submission(data, function(){
+            // skip this person's turn
+            data.room.nextTurn();
+            data.room.newPoll(data.voteType);
+            io.to(data.room.name).emit('user turn', new PublicUser(data.room.whoseTurn()));
+        });
+    });
+    client.on('vote undo story', function(data){
+        if (!(data.roomName in users[client.id].rooms)) return;
+        data = {
+            user: users[client.id],
+            room: rooms[data.roomName],
+            voteType: data.voteType
+        };
+        vote_submission(data, function(){
+            // undo last continuation and go back a turn
+            data.room.story.undoLast();
+            data.room.prevTurn();
+            data.room.newPoll(data.voteType);
+            io.to(data.room.name).emit("story",
+                {
+                    story: data.room.story.continuations,
+                    turn: new PublicUser(data.room.whoseTurn())
+                }
+            );
+            io.to(data.room.name).emit('user turn', new PublicUser(data.room.whoseTurn()));
+        });
     });
 
  

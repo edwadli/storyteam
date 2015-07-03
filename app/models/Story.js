@@ -20,6 +20,10 @@ method.addToStory = function(msg, user){
     this.continuations.push({text: msg, author: new PublicUser(user)});
 };
 
+method.undoLast = function(){
+    this.continuations.pop();
+}
+
 function isAlphaWithPunct(str) {
     return /^[(<'"]*[a-zA-Z&'-]+[.,!?;:)>'"]*$/.test(str);
 }

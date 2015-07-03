@@ -1,9 +1,9 @@
 
 
 Basic Gameplay Functionality
-TODO: vote undo story update
+TODO: refactor voting system
+TODO: add timer for voting system
 TODO: vote kick user
-TODO: vote skip user turn (maybe after timeout)
 TODO: prevent spam by long strings (but still allow for
 potentially made-up words/ other languages/ proper nouns).
 TODO: pre-start page to wait for everyone to join the room?

@@ -6,9 +6,15 @@ mixin storybuilder(roomName)
             height: 100%;
         }
         div.storyTurn{
+            float: left;
             width:20%;
         }
+        div.storyOptions{
+            float: right;
+            width: 70%;
+        }
         div.storylog{
+            clear: both;
             height: 90%;
             width: 100%;
             overflow-y: scroll;
@@ -21,10 +27,37 @@ mixin storybuilder(roomName)
         p.storyErrorMessage {
             font-size: 0.5em;
         }
+        div.skipTurn {
+            float: right;
+        }
+        div.undoStory {
+            float: left;
+        }
+        div.undoStory form {
+            float: left;
+        }
+        div.skipTurn form {
+            float: right;
+        }
+        div.skipTurn div.voteResults {
+            float: left;
+        }
+        div.undoStory div.voteResults {
+            float: right;
+        }
 
     div(class='hiddenroomtitle',data-room!=roomName)= roomName
     div.storybuilder
         div.storyTurn
+        div.storyOptions
+            div.skipTurn
+                div.voteResults
+                form
+                    button.vote(data-vote='vote skip turn') vote skip
+            div.undoStory
+                div.voteResults
+                form
+                    button.vote(data-vote='vote undo story') vote undo
         div.storylog
             div.story
         div.storyinput
@@ -34,6 +67,27 @@ mixin storybuilder(roomName)
             p.storyErrorMessage
 
     script.
+        // skip turn vote
+        $('button.vote').click(function(event){
+            event.preventDefault();
+            socket.emit($(this).data('vote'),
+                {roomName: $('div.hiddenroomtitle').data('room'), voteType: $(this).data('vote')});
+            return false;
+        });
+        socket.on('vote skip turn', function(data){
+            if (data.vote === '0') {
+                $('div.skipTurn div.voteResults').text("");
+                return;
+            }
+            $('div.skipTurn div.voteResults').text(data.votes+'/'+data.total);
+        });
+        socket.on('vote undo story', function(data){
+            if (data.vote === '0') {
+                $('div.skipTurn div.voteResults').text("");
+                return;
+            }
+            $('div.undoStory div.voteResults').text(data.votes+'/'+data.total);
+        });
 
         // story
         socket.emit("refresh story", {roomName: $('div.hiddenroomtitle').data('room')});
@@ -54,14 +108,13 @@ mixin storybuilder(roomName)
             $('div.story').html(constructStoryHtml(data.story));
             $('div.storylog').scrollTop($('div.story').height());
         });
-
         socket.on('story error', function(data){
             $('p.errorMessage').html(data.msg);
         });
 
+        // story construction helper function
         var constructStoryHtml = function (continuations){
             var storyHtml = $('<div>').addClass('storyText');
-            var colors = ['#999966','white'];
             for (var i=0; i<continuations.length; i++){
                 var entry = continuations[i];
                 storyHtml.append(

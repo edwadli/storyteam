@@ -1,6 +1,7 @@
 
 var Story = require(__dirname+"/Story.js");
 var PublicUser = require(__dirname+"/PublicUser.js");
+var Vote = require(__dirname+"/Vote.js");
 
 var nodemethod = TurnNode.prototype;
 function TurnNode(user) {
@@ -19,7 +20,31 @@ function Room(name) {
     this.turn = null;
     this.users = {};
     this.color_iterator = this.ColorIterator();
+    this.polls = {};
+    this.pollNames = ['vote skip turn', 'vote undo story'];
+    this.initAllPolls();
 }
+
+method.getPoll = function(name) {
+    return this.polls[name];
+};
+
+method.newPoll = function(name) {
+    if (!(this.pollNames.indexOf(name) >= 0)) return;
+    this.polls[name] = new Vote(this.getUsers());
+};
+
+method.initAllPolls = function() {
+    for (var i=0; i<this.pollNames.length; i++) {
+        this.polls[this.pollNames[i]] = new Vote(this.getUsers());
+    }
+};
+
+method.removeVoter = function(userId){
+    for (var i=0; i<this.pollNames.length; i++) {
+        this.polls[this.pollNames[i]].removeVoter(userId);
+    }
+};
 
 method.ColorIterator = function(){
     var color_index = 0;
@@ -36,7 +61,7 @@ method.ColorIterator = function(){
             return colors_list[color_index++%colors_list.length];
         }
     }
-}
+};
 
 method.addUser = function(user) {
     user.color = this.color_iterator.next();
@@ -53,6 +78,8 @@ method.addUser = function(user) {
         currTurn.prev = newNode;
         this.users[user.id] = newNode;
     }
+    // TODO: Vote should we re init votes or just add the user?
+    this.initAllPolls();
 };
 
 method.removeUser = function(userId) {
@@ -74,6 +101,9 @@ method.removeUser = function(userId) {
         prevNode.next = nextNode;
         nextNode.prev = prevNode;
     }
+
+    // make sure votes are still able to finish
+    this.removeVoter(userId);
     
     // get rid of user entry
     delete this.users[userId];
