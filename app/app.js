@@ -78,7 +78,7 @@ io.on('connection', function(client){
         if (!(data.roomName in users[client.id].rooms)) return;
         var room = rooms[data.roomName];
         client.emit('user list',room.getUsers().map(function(user){return new PublicUser(user);}));
-        //client.emit('user turn', new PublicUser(room.whoseTurn()));
+        client.emit('gone user list', room.getDeadUsers());
     });
 
     // story building
@@ -171,7 +171,7 @@ io.on('connection', function(client){
                 total: room.getPoll(pollNames[i]).numMajority()});
         }
     });
- 
+    
     // modification to socket library for onclose events
     client.onclose = function(reason){
         disconnect_cb(client);
@@ -186,12 +186,14 @@ io.on('connection', function(client){
                 if (!(user.rooms.hasOwnProperty(key))) continue;
                 var room = user.rooms[key];
                 room.removeUser(user.id);
-                io.to(room.name).emit('user turn', new PublicUser(room.whoseTurn()));
-                io.to(room.name).emit('user left', {name: user.name});
                 if (Object.keys(room.users).length === 0)
                 {
                     // remove room if user was last in the room
                     delete rooms[room.name];
+                }
+                else {
+                    io.to(room.name).emit('user turn', new PublicUser(room.whoseTurn()));
+                    io.to(room.name).emit('user left', {name: user.name});    
                 }
             }
             // remove user from users list

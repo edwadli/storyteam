@@ -8,14 +8,14 @@ mixin userslist(roomName)
             width: 100%;
             overflow-y: scroll;
         }
-        #presentUsers {
+        .users {
             list-style-type: none;
             margin: 0;
             padding: 0;
             position: relative;
             width: 80%;
         }
-        #presentUsers li {
+        .users li {
             position: relative;
             height: 1em;
             width: 100%;
@@ -25,15 +25,13 @@ mixin userslist(roomName)
             padding-left: 2%;
         }
 
-        /*#presentUsers li:nth-child(odd) { background: #eee; } */
-
-        #presentUsers li div.turnIcon {
+        .users li div.turnIcon {
             position: relative;
             width: 20%;
             height: 1em;
             float: left;
         }
-        #presentUsers li div.userName {
+        .users li div.userName {
             position: relative;
             width: 80%;
             float: right;
@@ -50,18 +48,18 @@ mixin userslist(roomName)
     div.hiddenroomtitle= roomName
     div.userstitle users
     div.userslist
-        ul(id="presentUsers")
+        ul.users(id="presentUsers")
+        ul.users(id="goneUsers")
 
     script.
-        //var users = {};
         // populate user list
         socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
-        socket.on("user list", function(data){
-            //users = {};
-            $('#presentUsers').html("");
-            for (var i=0; i<data.length; i++) {
+
+        var addListToElement = function(element, data){
+            for (var i=0; i<data.length; i++){
                 var user = data[i];
-                $('#presentUsers').append($('<li>')
+                console.log(user);
+                element.append($('<li>')
                     .css('background-color', user.color)
                     .addClass(user.publicid)
                     .append($('<div>')
@@ -70,8 +68,17 @@ mixin userslist(roomName)
                     .append($('<div>')
                         .addClass('turnIcon'))
                 );
-                //users[pid] = user.name;
             }
+        };
+        socket.on("user list", function(data){
+            var elem = $('#presentUsers');
+            elem.html("");
+            addListToElement(elem,data);
+        });
+        socket.on("gone user list", function(data){
+            var elem = $('#goneUsers');
+            elem.html("");
+            addListToElement(elem,data);
         });
         // refresh whever a user leaves or joins
         socket.on("user left", function(data){

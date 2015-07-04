@@ -12,7 +12,7 @@ set rules)
 
 
 Basic Gameplay Aesthetics
-TODO: make sound for chat vs turn different
+TODO: make sound for chat vs turn different(or leave out textmsg for chats)
 TODO: embed story input box to current story text position
 TODO: 'dead' players list (people who quit)
 

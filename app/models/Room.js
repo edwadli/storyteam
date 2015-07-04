@@ -19,6 +19,7 @@ function Room(name) {
     this.options = {maxWords: 3};
     this.turn = null;
     this.users = {};
+    this.deadUsers = [];
     this.color_iterator = this.ColorIterator();
     this.polls = {};
     this.pollNames = ['vote skip turn', 'vote undo story'];
@@ -57,12 +58,12 @@ method.addVoter = function(user){
 
 method.ColorIterator = function(){
     var color_index = 0;
-    var colors = {'red': '#E57373','blue': '#64B5F6','green': '#81C784',
+    var colors = {'blue': '#64B5F6','green': '#81C784',
         'orange': '#FFB74D','brown': '#A1887F','pink': '#F06292',
-        'purple': '#BA68C8','deep_purple': '#9575CD',
-        'indigo': '#7986CB','light_blue': '#4FC3F7','cyan': '#4DD0E1',
-        'teal': '#4DB6AC','light_green': '#AED581','lime': '#DCE775',
-        'yellow': '#FFF176','amber': '#FFD54F','deep_orange': '#FF8A65',
+        'purple': '#BA68C8','red': '#E57373','cyan': '#4DD0E1',
+        'deep_purple': '#9575CD','light_blue': '#4FC3F7','yellow': '#FFF176',
+        'indigo': '#7986CB', 'teal': '#4DB6AC','light_green': '#AED581',
+        'amber': '#FFD54F','lime': '#DCE775', 'deep_orange': '#FF8A65',
         'blue_grey': '#90A4AE'};
     var colors_list = Object.keys(colors).map(function(key){return colors[key];});
     return {
@@ -113,6 +114,9 @@ method.removeUser = function(userId) {
 
     // make sure votes are still able to finish
     this.removeVoter(userId);
+
+    // keep a record of user who left
+    this.deadUsers.push(new PublicUser(this.users[userId]));
     
     // get rid of user entry
     delete this.users[userId];
@@ -137,6 +141,10 @@ method.getUsers = function() {
         curr_id = this.users[curr_id].next.user.id;
     }
     return list;
+};
+
+method.getDeadUsers = function() {
+    return this.deadUsers;
 };
 
 method.userSubmission = function(user, submission){
