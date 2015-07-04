@@ -83,3 +83,4 @@ method.hasMajority = function(){
 }
 
 module.exports = Vote;
+

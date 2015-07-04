@@ -1,13 +1,13 @@
 
 
 Basic Gameplay Functionality
+TODO: let users set rules (maybe assign host for each room and only let host
+set rules)
 TODO: add timer for voting system
 TODO: vote kick user
 TODO: prevent spam by long strings (but still allow for
 potentially made-up words/ other languages/ proper nouns).
 TODO: pre-start page to wait for everyone to join the room?
-TODO: let users set rules (maybe assign host for each room and only let host
-set rules)
 
 
 Basic Gameplay Aesthetics
