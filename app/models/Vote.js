@@ -55,6 +55,11 @@ method.removeVoter = function(userId){
 	delete this.records[userId];
 };
 
+method.addVoter = function(user){
+    if (user.id in this.records) return;
+    this.records[user.id] = {user: user, isAye: null};
+}
+
 method.numVoters = function(){
 	return Object.keys(this.records).length;
 };

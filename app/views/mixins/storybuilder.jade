@@ -70,8 +70,9 @@ mixin storybuilder(roomName)
         // skip turn vote
         $('button.vote').click(function(event){
             event.preventDefault();
-            socket.emit($(this).data('vote'),
-                {roomName: $('div.hiddenroomtitle').data('room'), voteType: $(this).data('vote')});
+            socket.emit('vote',
+                {roomName: $('div.hiddenroomtitle').data('room'),
+                    voteType: $(this).data('vote')});
             return false;
         });
         socket.on('vote skip turn', function(data){
@@ -107,9 +108,19 @@ mixin storybuilder(roomName)
 
             $('div.story').html(constructStoryHtml(data.story));
             $('div.storylog').scrollTop($('div.story').height());
+
+            // update votes
+            socket.emit("vote update", {roomName: $('div.hiddenroomtitle').data('room')});
         });
         socket.on('story error', function(data){
             $('p.errorMessage').html(data.msg);
+        });
+        // update polls
+        socket.on('user joined', function(data){
+            socket.emit('vote update', {roomName: $('div.hiddenroomtitle').data('room')});
+        });
+        socket.on('user left', function(data){
+            socket.emit('vote update', {roomName: $('div.hiddenroomtitle').data('room')});
         });
 
         // story construction helper function

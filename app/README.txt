@@ -12,7 +12,7 @@ set rules)
 
 
 Basic Gameplay Aesthetics
-TODO: add notifications to 'user turn' event (in room.jade)
+TODO: make sound for chat vs turn different
 TODO: embed story input box to current story text position
 TODO: 'dead' players list (people who quit)
 

@@ -25,6 +25,10 @@ function Room(name) {
     this.initAllPolls();
 }
 
+method.getStory = function(){
+    return this.story.continuations;
+}
+
 method.getPoll = function(name) {
     return this.polls[name];
 };
@@ -43,6 +47,11 @@ method.initAllPolls = function() {
 method.removeVoter = function(userId){
     for (var i=0; i<this.pollNames.length; i++) {
         this.polls[this.pollNames[i]].removeVoter(userId);
+    }
+};
+method.addVoter = function(user){
+    for (var i=0; i<this.pollNames.length; i++) {
+        this.polls[this.pollNames[i]].addVoter(user);
     }
 };
 
@@ -78,8 +87,8 @@ method.addUser = function(user) {
         currTurn.prev = newNode;
         this.users[user.id] = newNode;
     }
-    // TODO: Vote should we re init votes or just add the user?
-    this.initAllPolls();
+    // add user to all polls
+    this.addVoter(user);
 };
 
 method.removeUser = function(userId) {
@@ -140,6 +149,8 @@ method.userSubmission = function(user, submission){
         if (errMsg === null) {
             this.nextTurn();
             this.story.addToStory(submission, user);
+            // reset polls
+            this.initAllPolls();
         }
     }
     return errMsg;
