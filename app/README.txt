@@ -1,7 +1,6 @@
 
 
 Basic Gameplay Functionality
-TODO: refactor voting system
 TODO: add timer for voting system
 TODO: vote kick user
 TODO: prevent spam by long strings (but still allow for
@@ -14,7 +13,6 @@ set rules)
 Basic Gameplay Aesthetics
 TODO: make sound for chat vs turn different(or leave out textmsg for chats)
 TODO: embed story input box to current story text position
-TODO: 'dead' players list (people who quit)
 
 
 Login/Joining
@@ -40,7 +38,7 @@ TODO: max players
 TODO: more modes: iambic pentameter, rhyming, non-alphabetic languages (eg,
 chinese), limerick, sentence, everyone plays (where people vote on their
 favorite continuation each turn) etc...
-
+TODO: timers for each player (like chess clock)
 
 Other:
 favicon.ico

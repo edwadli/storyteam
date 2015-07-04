@@ -116,7 +116,7 @@ method.removeUser = function(userId) {
     this.removeVoter(userId);
 
     // keep a record of user who left
-    this.deadUsers.push(new PublicUser(this.users[userId]));
+    this.deadUsers.push(new PublicUser(this.users[userId].user));
     
     // get rid of user entry
     delete this.users[userId];

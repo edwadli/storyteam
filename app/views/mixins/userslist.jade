@@ -44,11 +44,25 @@ mixin userslist(roomName)
             background-size: 15px;
         }
 
+        #presentUsers{
+            position: relative;
+            height: 60%;
+        }
+        p.gone {
+            position: relative;
+            padding-left: 2%;
+        }
+        #goneUsers {
+            position: relative;
+            top: 1%;
+        }
+
     
     div.hiddenroomtitle= roomName
     div.userstitle users
     div.userslist
         ul.users(id="presentUsers")
+        p.gone previous users
         ul.users(id="goneUsers")
 
     script.
@@ -58,7 +72,6 @@ mixin userslist(roomName)
         var addListToElement = function(element, data){
             for (var i=0; i<data.length; i++){
                 var user = data[i];
-                console.log(user);
                 element.append($('<li>')
                     .css('background-color', user.color)
                     .addClass(user.publicid)
