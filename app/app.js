@@ -58,7 +58,6 @@ io.on('connection', function(client){
         client.emit("join room result", jade.renderFile(__dirname+'/views/room.jade',
                 {roomName: name}));
         client.emit("update user", new PublicUser(user));
-        client.emit("user turn", new PublicUser(room.whoseTurn()));
     });
 
     // side chat
@@ -80,6 +79,7 @@ io.on('connection', function(client){
         var room = rooms[data.roomName];
         client.emit('user list',room.getUsers().map(function(user){return new PublicUser(user);}));
         client.emit('gone user list', room.getDeadUsers());
+        client.emit("user turn", new PublicUser(room.whoseTurn()));
     });
 
     // story building
