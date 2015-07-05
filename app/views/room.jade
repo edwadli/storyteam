@@ -84,7 +84,6 @@ script.
             .text(data.name)
         ).append("'s turn");
         // set turn icon on userslist
-        console.log($('#presentUsers').parent().html());
         $('#presentUsers li div.turnIcon').removeClass('hasTurn');
         $('#presentUsers li.'+data.publicid+' div.turnIcon').addClass('hasTurn');
 
