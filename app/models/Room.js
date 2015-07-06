@@ -14,6 +14,7 @@ function TurnNode(user) {
 var method = Room.prototype;
 
 function Room(name) {
+    this.isStarted = false;
     this.name = name;
     this.story = new Story();
     this.options = {maxWords: 3};
@@ -116,7 +117,10 @@ method.removeUser = function(userId) {
     this.removeVoter(userId);
 
     // keep a record of user who left
-    this.deadUsers.push(new PublicUser(this.users[userId].user));
+    if (this.isStarted === true)
+    {
+        this.deadUsers.push(new PublicUser(this.users[userId].user));
+    }
     
     // get rid of user entry
     delete this.users[userId];

@@ -68,8 +68,11 @@ mixin storybuilder(roomName)
                 input#txtStory(type="text", autocomplete="off")
                 button#btnStory(type="submit") >
             p.storyErrorMessage
+    
+    audio#storyNotificationSound(src = "/resources/blop_sound.mp3")
 
     script.
+
         // skip turn vote
         $('button.vote').click(function(event){
             event.preventDefault();
@@ -118,6 +121,22 @@ mixin storybuilder(roomName)
         socket.on('story error', function(data){
             $('p.errorMessage').html(data.msg);
         });
+        // user turn
+        socket.on('user turn', function(data){
+            // display whose turn it is
+            $('div.storyTurn').html('');
+            $('div.storyTurn').append(
+                $('<span>').addClass(data.publicid)
+                .css('background-color', data.color)
+                .text(data.name)
+            ).append("'s turn");
+
+            if (socket.user.publicid === data.publicid){
+                // notification
+                storyNotification();
+            }
+        });
+
         // update polls
         socket.on('user joined', function(data){
             socket.emit('vote update', {roomName: $('div.hiddenroomtitle').data('room')});
@@ -143,4 +162,37 @@ mixin storybuilder(roomName)
             return storyHtml.get(0);
         };
 
+
+        // story notification helper
+        var storyNotification = function(){
+            if (document.inWindow === true) return;
+
+            var textNotify = function() {
+                var notification = new Notification("Your Turn! - StoryTeam");
+                setTimeout(function(){
+                    notification.close();
+                },2000);
+            };
+            var soundNotify = function(){
+                document.getElementById('storyNotificationSound').play();
+            };
+            if (!("Notification" in window)){
+                console.log("This browser does not support desktop notifications.");
+            }
+            else if (Notification.permission === "granted"){
+                textNotify();
+                soundNotify();
+            }
+            else if (Notification.permission === "default"){
+                // ask for permission
+                Notification.requestPermission(function(permission){
+                    if (permission === "granted"){
+                        textNotify();
+                        soundNotify();
+                    }
+                });
+            }
+            // else (denied) don't bother user
+
+        };
 

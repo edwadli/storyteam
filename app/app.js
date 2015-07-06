@@ -43,6 +43,9 @@ io.on('connection', function(client){
     client.on("login", function(name){site.login(client, name);});
     // join room
     client.on("join room", function(name){site.joinRoom(io, client, name);});
+
+    //TODO: join game if vote passes; set room.isStarted to FALSEE;
+    client.on("join game", function(name){site.joinGame(io,client,name);});
     // get rooms
     client.on("rooms list", function(){
         site.getRooms(client);

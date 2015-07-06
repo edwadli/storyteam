@@ -20,22 +20,35 @@ method.login = function(client, userName){
 };
 
 method.joinRoom = function(io, client, roomName){
-	// TODO: don't automatically create a new rom if room doesn't exist
 	// don't allow empty names
 	if (roomName.length === 0) return;
+	// create room if doesn't already exist
 	if (!(roomName in this.rooms)) this.rooms[roomName] = new Room(roomName);
-	var user = this.users[client.id];
+
 	var room = this.rooms[roomName];
+	var user = this.users[client.id];
 	room.addUser(user);
 	user.joinRoom(room);
-	// attach socketio room
-	client.join(roomName);
-	// send results of joining room
-    io.to(roomName).emit("user joined", {name: user.name});
-    client.emit("join room result", jade.renderFile(__dirname+'/../views/room.jade',
+	// attach socketio room for messages
+	client.join(room.name);
+	io.to(room.name).emit("user joined", {name: user.name});
+	// check if the room has already started playing
+	if (room.isStarted === true){
+		this.joinGame(io, client, room.name);
+		return;
+	}
+	client.emit("join room result", jade.renderFile(__dirname+'/../views/preroom.jade',
+		{roomName: room.name}));
+	client.emit("update user", new PublicUser(user));
+};
+
+method.joinGame = function(io, client, roomName){
+	// quit if game no longer available
+	if (!(roomName in this.rooms)) return;
+	var user = this.users[client.id];
+	var room = this.rooms[roomName];
+    client.emit("join game result", jade.renderFile(__dirname+'/../views/room.jade',
             {roomName: room.name}));
-    client.emit("update user", new PublicUser(user));
-    return room;
 };
 
 method.getRooms = function(client){
@@ -48,7 +61,6 @@ method.authorize = function(client, roomName){
 	if (roomName in user.rooms)
 		return {room: this.rooms[roomName], user: user};
 	else
-		console.log(user);
 		return null;
 };
 

@@ -1,0 +1,47 @@
+
+include mixins/chat
+include mixins/userslist
+
+style.
+    html, body {
+        height: 100%; width: 100%; margin: 0;
+    }
+    div.container {
+        width: 90%;
+        padding-left: 5%;
+        height: 100%;
+        position: relative;
+    }
+    div.sidechat {
+        float: right;
+        width: 25%;
+        height: 90%;
+    }
+    div.users {
+        float:right;
+        width: 15%;
+        height: 90%;
+    }
+    
+
+
+div.container
+    h1(id='roomTitle', data-room!=roomName)!= roomName
+    //- div.users
+    //-     +userslist(roomName)
+    //- div.sidechat
+    //-     +chat(roomName)
+
+script.
+
+    // TODO: emit votes only
+    // TODO: fix mixins so their scripts don't interfere (add uniquely generated class?)
+    socket.emit('join game', $('#roomTitle').data('room'));
+
+    socket.on('join game result', function(msg){
+        $('div.maincontent').html(msg);
+    });
+
+    socket.on('update user', function(data){
+        socket.user = data;
+    });

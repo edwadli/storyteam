@@ -27,6 +27,7 @@ block content
 
 block scripts
     script.
+
         var socket = io();
         // login
         var txtUsername = $('#txtUsername');
@@ -41,7 +42,3 @@ block scripts
         socket.on('validate user', function(data){
             socket.user = data;
         });
-
-        
-
-

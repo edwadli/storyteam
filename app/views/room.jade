@@ -41,18 +41,9 @@ div.container
     div.sidechat
         +chat(roomName)
 
-    audio#storyNotificationSound(src = "/resources/blop_sound.mp3")
 
 script.
-    document.inWindow = true;
-    $(window).blur(function(){
-        document.inWindow = false;
-    }).focus(function(){
-        document.inWindow = true;
-    });
-    socket.on('update user', function(data){
-        socket.user = data;
-    });
+
     socket.on('user list', function(data){
         var authors = $('#titleAuthors');
         authors.html('by ').append(
@@ -75,55 +66,3 @@ script.
             );
         }
     });
-
-    socket.on('user turn', function(data){
-        $('div.storyTurn').html('');
-        $('div.storyTurn').append(
-            $('<span>').addClass(data.publicid)
-            .css('background-color', data.color)
-            .text(data.name)
-        ).append("'s turn");
-        // set turn icon on userslist
-        $('#presentUsers li div.turnIcon').removeClass('hasTurn');
-        $('#presentUsers li.'+data.publicid+' div.turnIcon').addClass('hasTurn');
-
-        if (socket.user.publicid === data.publicid){
-            // notification
-            storyNotification();
-        }
-    });
-
-    var storyNotification = function(){
-        if (document.inWindow === true) return;
-
-        var textNotify = function() {
-            var notification = new Notification("Your Turn! - StoryTeam");
-            setTimeout(function(){
-                notification.close();
-            },2000);
-        };
-        var soundNotify = function(){
-            document.getElementById('storyNotificationSound').play();
-        };
-        if (!("Notification" in window)){
-            console.log("This browser does not support desktop notifications.");
-        }
-        else if (Notification.permission === "granted"){
-            textNotify();
-            soundNotify();
-        }
-        else if (Notification.permission === "default"){
-            // ask for permission
-            Notification.requestPermission(function(permission){
-                if (permission === "granted"){
-                    textNotify();
-                    soundNotify();
-                }
-            });
-        }
-        // else (denied) don't bother user
-
-    };
-
-
-

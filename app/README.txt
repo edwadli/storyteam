@@ -22,7 +22,7 @@ TODO: unique users/passwords
 
 
 Security
-
+TODO: max number of rooms, max str length for names
 
 Optimization
 TODO: separate style sheets and scripts from jade html

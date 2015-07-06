@@ -18,28 +18,28 @@ mixin chat(roomName)
             border: 1px solid black;
             white-space: nowrap;
         }
-        #txtChat{
+        .txtChat{
             width: 89%;
         }
-        #btnChat{
+        .btnChat{
             width: 9%;
             height:100%;
         }
-        #messages { list-style-type: none; margin: 0; padding: 0; }
-        #messages li {padding: 5px 10px; word-wrap: break-word;}
-        #messages li:nth-child(odd) { background: #eee; }
+        .messages { list-style-type: none; margin: 0; padding: 0; }
+        .messages li {padding: 5px 10px; word-wrap: break-word;}
+        .messages li:nth-child(odd) { background: #eee; }
 
     div.hiddenroomtitle= roomName
     div.chat
         div.chatsettings
             form
-                button#btnClear clear chat
+                button.btnClear clear chat
         div.chatlog
-            ul(id="messages")
+            ul.messages
         div.chatinput
             form
-                input#txtChat(type="text", autocomplete="off")
-                button#btnChat(type="submit") >
+                input.txtChat(type="text", autocomplete="off")
+                button.btnChat(type="submit") >
         p.errorMessage
 
     audio#chatNotificationSound(src = "/resources/blop_sound.mp3")
@@ -47,7 +47,7 @@ mixin chat(roomName)
     script.
 
         // chat
-        var txtChat = $('#txtChat');
+        var txtChat = $('.txtChat');
         $('div.chatinput form').submit(function() {
             var msg = txtChat.val();
             // don't allow empty submissions
@@ -61,27 +61,27 @@ mixin chat(roomName)
         });
         socket.on('chat', function(data){
             var msg = data.name+": "+data.msg;
-            $('#messages').append($('<li>').text(msg));
+            $('.messages').append($('<li>').text(msg));
             chatNotification(msg);
-            $('div.chatlog').scrollTop($('#messages').height());
+            $('div.chatlog').scrollTop($('.messages').height());
         });
         socket.on('self chat', function(data){
             var msg = data.name+": "+data.msg;
-            $('#messages').append($('<li>').text(msg));
-            $('div.chatlog').scrollTop($('#messages').height());
+            $('.messages').append($('<li>').text(msg));
+            $('div.chatlog').scrollTop($('.messages').height());
         });
         socket.on('user left', function(data){
             var msg = data.name+" has left";
-            $('#messages').append($('<li>').text(msg));
-            $('div.chatlog').scrollTop($('#messages').height());
+            $('.messages').append($('<li>').text(msg));
+            $('div.chatlog').scrollTop($('.messages').height());
         });
         socket.on('user joined', function(data){
             var msg = data.name+" has joined";
-            $('#messages').append($('<li>').text(msg));
-            $('div.chatlog').scrollTop($('#messages').height());
+            $('.messages').append($('<li>').text(msg));
+            $('div.chatlog').scrollTop($('.messages').height());
         });
-        $('#btnClear').click(function() {
-            $('#messages').html("");
+        $('.btnClear').click(function() {
+            $('.messages').html("");
             return false;
         });
 
@@ -119,6 +119,3 @@ mixin chat(roomName)
             }
             // else (denied) don't bother user
         };
-
-
-

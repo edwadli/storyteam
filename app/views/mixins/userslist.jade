@@ -66,6 +66,7 @@ mixin userslist(roomName)
         ul.users(id="goneUsers")
 
     script.
+
         // populate user list
         socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
 
@@ -93,6 +94,11 @@ mixin userslist(roomName)
             elem.html("");
             addListToElement(elem,data);
         });
+        socket.on('user turn', function(data){
+            // set turn icon on userslist
+            $('#presentUsers li div.turnIcon').removeClass('hasTurn');
+            $('#presentUsers li.'+data.publicid+' div.turnIcon').addClass('hasTurn');
+        });
         // refresh whever a user leaves or joins
         socket.on("user left", function(data){
             socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
@@ -100,4 +106,3 @@ mixin userslist(roomName)
         socket.on("user joined", function(data){
             socket.emit("user list", {roomName: $('div.hiddenroomtitle').html()});
         });
-
