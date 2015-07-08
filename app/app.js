@@ -14,22 +14,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // socketio
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-// models
-var Room = require(__dirname+'/models/Room.js');
-var User = require(__dirname+'/models/User.js');
-var Story = require(__dirname+'/models/Story.js');
-var PublicUser = require(__dirname+'/models/PublicUser.js');
 
+// controllers
 var SessionManager = require(__dirname+'/controllers/SessionManager.js');
 var Chat = require(__dirname+'/controllers/Chat.js');
 var Gameplay = require(__dirname+'/controllers/Gameplay.js');
+var VoteManager = require(__dirname+'/controllers/VoteManager.js');
 
 var site = new SessionManager();
 var chat = new Chat();
 var gameplay = new Gameplay();
-
-var users = {};
-var rooms = {};
+var vote = new VoteManager();
 
 // main page
 app.get('/', function(req,res){
@@ -44,8 +39,6 @@ io.on('connection', function(client){
     // join room
     client.on("join room", function(name){site.joinRoom(io, client, name);});
 
-    //TODO: join game if vote passes; set room.isStarted to FALSEE;
-    client.on("join game", function(name){site.joinGame(io,client,name);});
     // get rooms
     client.on("rooms list", function(){
         site.getRooms(client);
@@ -80,7 +73,7 @@ io.on('connection', function(client){
         // make sure room is one of client's rooms
         info = site.authorize(client, data.roomName);
         if (info === null) return;
-        gameplay.getVotes(client,info.room);
+        vote.getVotes(client,info.room);
     });
 
 
@@ -96,7 +89,7 @@ io.on('connection', function(client){
         // make sure room is one of client's rooms
         info = site.authorize(client, data.roomName);
         if (info === null) return;
-        gameplay.submitVote(io,info.user,info.room,data.voteType);
+        vote.submitVote(io,info.user,info.room,data.voteType);
     });
 
     
@@ -108,26 +101,6 @@ io.on('connection', function(client){
     // leaving everything (cleanup)
     disconnect_cb = function(client){
         site.leave(io, client);
-        // if (client.id in users) {
-        //     var user = users[client.id];
-        //     // remove user from rooms
-        //     for (var key in user.rooms){
-        //         if (!(user.rooms.hasOwnProperty(key))) continue;
-        //         var room = user.rooms[key];
-        //         room.removeUser(user.id);
-        //         if (Object.keys(room.users).length === 0)
-        //         {
-        //             // remove room if user was last in the room
-        //             delete rooms[room.name];
-        //         }
-        //         else {
-        //             io.to(room.name).emit('user turn', new PublicUser(room.whoseTurn()));
-        //             io.to(room.name).emit('user left', {name: user.name});    
-        //         }
-        //     }
-        //     // remove user from users list
-        //     delete users[client.id];
-        // }
     };
 });
 

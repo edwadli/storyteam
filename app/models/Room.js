@@ -2,6 +2,7 @@
 var Story = require(__dirname+"/Story.js");
 var PublicUser = require(__dirname+"/PublicUser.js");
 var Vote = require(__dirname+"/Vote.js");
+var Options = require(__dirname+"/Options.js");
 
 var nodemethod = TurnNode.prototype;
 function TurnNode(user) {
@@ -14,11 +15,11 @@ function TurnNode(user) {
 var method = Room.prototype;
 
 function Room(name) {
-    this.isStarted = false;
     this.name = name;
     this.story = new Story();
-    this.options = {maxWords: 3};
+    this.options = new Options();
     this.turn = null;
+    this.host = null;
     this.users = {};
     this.deadUsers = [];
     this.color_iterator = this.ColorIterator();
@@ -75,7 +76,14 @@ method.ColorIterator = function(){
 };
 
 method.addUser = function(user) {
+    // assign new color
     user.color = this.color_iterator.next();
+    // assign host, if needed
+    if (this.host === null) {
+        this.host = user.id;
+        user.isHost = true;        
+    }
+    // insert to last turn position
     if (Object.keys(this.users).length === 0){
         this.users[user.id] = new TurnNode(user);
         this.turn = user.id;
@@ -89,6 +97,7 @@ method.addUser = function(user) {
         currTurn.prev = newNode;
         this.users[user.id] = newNode;
     }
+
     // add user to all polls
     this.addVoter(user);
 };
@@ -97,10 +106,17 @@ method.removeUser = function(userId) {
     // make sure user is in room
     if (!(userId in this.users)) return;
 
+    this.users[userId].user.isHost = false;
     if (Object.keys(this.users).length <= 1){
         this.turn = null;
+        this.host = null;
+
     }
     else {
+        // pass host on to next person if necessary
+        if (this.host === userId){
+            this.host = this.users[this.host].next.user.id;
+        }
         // keep turns consistent
         if (this.turn === userId) {
             this.nextTurn();
@@ -111,16 +127,14 @@ method.removeUser = function(userId) {
         var nextNode = oldNode.next;
         prevNode.next = nextNode;
         nextNode.prev = prevNode;
+
     }
 
     // make sure votes are still able to finish
     this.removeVoter(userId);
 
     // keep a record of user who left
-    if (this.isStarted === true)
-    {
-        this.deadUsers.push(new PublicUser(this.users[userId].user));
-    }
+    this.deadUsers.push(new PublicUser(this.users[userId].user));
     
     // get rid of user entry
     delete this.users[userId];
@@ -135,6 +149,9 @@ method.nextTurn = function() {
 method.prevTurn = function() {
     this.turn = this.users[this.turn].prev.user.id;
 };
+method.getHost = function() {
+    return this.users[this.host].user;
+}
 
 method.getUsers = function() {
     var list = [];

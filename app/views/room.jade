@@ -66,3 +66,7 @@ script.
             );
         }
     });
+
+    socket.on('update user', function(data){
+        socket.user = data;
+    });

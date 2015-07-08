@@ -1,0 +1,29 @@
+
+mixin options(roomName)
+	style.
+		div {
+			display: block;
+		}
+
+	div.hiddenroomtitle(data-room!=roomName)
+	div.menu
+		form
+			p.showNumWords
+			input.txtNumWords(type="text", autocomplete="off",data-type='numWords')
+			button.btnNumWords >
+
+	script.
+		// TODO populate inital menu options
+		// TODO: allow other options
+		var txtNumWords = $('.txtNumWords');
+		$('div.menu form').submit(function(){
+			var num = parseInt(txtNumWords.val());
+			if (num !== NaN){
+				socket.emit('options',
+					{type: txtNumWords.data('type'), data: num});
+			}
+			return false;
+		});
+		socket.on('options', function(opts){
+			txtNumWords.val(opts.data);
+		});

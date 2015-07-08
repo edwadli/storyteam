@@ -32,24 +32,12 @@ method.joinRoom = function(io, client, roomName){
 	// attach socketio room for messages
 	client.join(room.name);
 	io.to(room.name).emit("user joined", {name: user.name});
-	// check if the room has already started playing
-	if (room.isStarted === true){
-		this.joinGame(io, client, room.name);
-		return;
-	}
-	client.emit("join room result", jade.renderFile(__dirname+'/../views/preroom.jade',
+
+	client.emit("join room result", jade.renderFile(__dirname+'/../views/room.jade',
 		{roomName: room.name}));
 	client.emit("update user", new PublicUser(user));
 };
 
-method.joinGame = function(io, client, roomName){
-	// quit if game no longer available
-	if (!(roomName in this.rooms)) return;
-	var user = this.users[client.id];
-	var room = this.rooms[roomName];
-    client.emit("join game result", jade.renderFile(__dirname+'/../views/room.jade',
-            {roomName: room.name}));
-};
 
 method.getRooms = function(client){
 	client.emit("rooms list", Object.keys(this.rooms));
