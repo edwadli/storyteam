@@ -85,6 +85,15 @@ mixin chat(roomName)
             return false;
         });
 
+        // TODO: move this help text somewhere else
+        $('.messages').append($('<li>').text(
+            "How To Play: Write a story with your friends. "+
+            "Each person can contribute up to 3 words on their turn; "+
+            "you can use punctuation marks anywhere except "+
+            "at the end of your contribution."
+        ));
+        $('div.chatlog').scrollTop($('.messages').height());
+
         
         var chatNotification = function(message){
             // don't notify if user in already in the window
