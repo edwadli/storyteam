@@ -5,14 +5,16 @@ TODO: let users set rules (maybe assign host for each room and only let host
 set rules)
 TODO: add timer for voting system
 TODO: vote kick user
-TODO: prevent spam by long strings (but still allow for
-potentially made-up words/ other languages/ proper nouns).
-TODO: pre-start page to wait for everyone to join the room?
+
+
+Potential Functionality
+TODO: pre-start page to wait for everyone to join the room
+TODO: post-game page to see stats/contributions
 
 
 Basic Gameplay Aesthetics
-TODO: make sound for chat vs turn different(or leave out textmsg for chats)
 TODO: embed story input box to current story text position
+TODO: make sound for chat vs turn different(or leave out textmsg for chats)
 
 
 Login/Joining
@@ -21,8 +23,11 @@ TODO: option for private room
 TODO: unique users/passwords
 
 
-Security
+Safety
 TODO: max number of rooms, max str length for names
+TODO: prevent spam by long strings (but still allow for
+potentially made-up words/ other languages/ proper nouns).
+
 
 Optimization
 TODO: separate style sheets and scripts from jade html

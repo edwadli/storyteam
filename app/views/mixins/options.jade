@@ -1,29 +1,36 @@
 
 mixin options(roomName)
 	style.
-		div {
-			display: block;
+		div.menu {
+			border: 1px solid green;
+			height: 100%;
 		}
 
 	div.hiddenroomtitle(data-room!=roomName)
 	div.menu
 		form
-			p.showNumWords
+			p.showNumWords Number of words per turn
 			input.txtNumWords(type="text", autocomplete="off",data-type='numWords')
 			button.btnNumWords >
 
 	script.
+
+		var roomName = $('div.hiddenroomtitle').data('room');
 		// TODO populate inital menu options
+		socket.emit('options', {roomName: roomName});
 		// TODO: allow other options
 		var txtNumWords = $('.txtNumWords');
 		$('div.menu form').submit(function(){
 			var num = parseInt(txtNumWords.val());
 			if (num !== NaN){
 				socket.emit('options',
-					{type: txtNumWords.data('type'), data: num});
+					{type: txtNumWords.data('type'),
+					data: num,
+					roomName: roomName
+				});
 			}
 			return false;
 		});
 		socket.on('options', function(opts){
-			txtNumWords.val(opts.data);
+			txtNumWords.val(opts.maxWords);
 		});

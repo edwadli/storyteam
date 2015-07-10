@@ -28,9 +28,13 @@ function Room(name) {
     this.initAllPolls();
 }
 
+method.getOptions = function(){
+    return this.options;
+};
+
 method.getStory = function(){
     return this.story.continuations;
-}
+};
 
 method.getPoll = function(name) {
     return this.polls[name];

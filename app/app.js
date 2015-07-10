@@ -20,11 +20,13 @@ var SessionManager = require(__dirname+'/controllers/SessionManager.js');
 var Chat = require(__dirname+'/controllers/Chat.js');
 var Gameplay = require(__dirname+'/controllers/Gameplay.js');
 var VoteManager = require(__dirname+'/controllers/VoteManager.js');
+var OptionsEditor = require(__dirname+'/controllers/OptionsEditor.js')
 
 var site = new SessionManager();
 var chat = new Chat();
 var gameplay = new Gameplay();
 var vote = new VoteManager();
+var optionsEditor = new OptionsEditor();
 
 // main page
 app.get('/', function(req,res){
@@ -53,6 +55,16 @@ io.on('connection', function(client){
         chat.message(client, data.msg, info.room, info.user);
     });
 
+    // get options
+    client.on("options", function(data){
+        // make sure room is one of client's rooms
+        info = site.authorize(client, data.roomName);
+        if (info === null) return;
+        if (!(data.type))
+            optionsEditor.getOptions(client,info.room);
+        else
+            optionsEditor.updateOption(io,info.room,data.type,data.data)
+    });
 
     // users in the room
     client.on("user list", function(data){

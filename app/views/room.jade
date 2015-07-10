@@ -2,6 +2,7 @@
 include mixins/chat
 include mixins/storybuilder
 include mixins/userslist
+include mixins/options
 
 style.
     html, body {
@@ -16,7 +17,12 @@ style.
     div.storybuilding {
         float: left;
         width: 60%;
-        height: 90%;
+        height: 60%;
+    }
+    div.optionmenu {
+        float: left;
+        width: 60%;
+        height: 15%;
     }
     div.sidechat {
         float: right;
@@ -40,6 +46,8 @@ div.container
         +userslist(roomName)
     div.sidechat
         +chat(roomName)
+    div.optionmenu
+        +options(roomName)
 
 
 script.
