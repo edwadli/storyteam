@@ -19,6 +19,8 @@ method.getVotes = function(client, room){
 
 
 method.submitVote = function(io, user, room, voteType){
+    // make sure voteType is valid
+    if (!(voteType in vote_cb)) return;
     room.getPoll(voteType).submitVote(user);
     if (room.getPoll(voteType).hasMajority()){
         vote_cb[voteType](io, {user:user, room:room, voteType:voteType});

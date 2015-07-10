@@ -8,6 +8,7 @@ mixin options(roomName)
 
 	div.hiddenroomtitle(data-room!=roomName)
 	div.menu
+		h3.menuTitle Options
 		form
 			p.showNumWords Number of words per turn
 			input.txtNumWords(type="text", autocomplete="off",data-type='numWords')
@@ -16,10 +17,25 @@ mixin options(roomName)
 	script.
 
 		var roomName = $('div.hiddenroomtitle').data('room');
-		// TODO populate inital menu options
+		// populate inital menu options
 		socket.emit('options', {roomName: roomName});
+
 		// TODO: allow other options
 		var txtNumWords = $('.txtNumWords');
+		$('div.menu form').keydown(function(){
+			// only host can edit
+			if (socket.user.isHost !== true){
+				$(this).children().blur();
+				return false;
+			}
+		});
+		$('div.menu form').click(function(){
+			// only host can edit
+			if (socket.user.isHost !== true){
+				$(this).children().blur();
+				return false;
+			}
+		});
 		$('div.menu form').submit(function(){
 			var num = parseInt(txtNumWords.val());
 			if (num !== NaN){
@@ -33,4 +49,5 @@ mixin options(roomName)
 		});
 		socket.on('options', function(opts){
 			txtNumWords.val(opts.maxWords);
+			txtNumWords.blur();
 		});

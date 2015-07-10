@@ -63,7 +63,7 @@ io.on('connection', function(client){
         if (!(data.type))
             optionsEditor.getOptions(client,info.room);
         else
-            optionsEditor.updateOption(io,info.room,data.type,data.data)
+            optionsEditor.updateOption(io,info.room,info.user,data.type,data.data)
     });
 
     // users in the room
