@@ -209,20 +209,32 @@ function isInvalidPlay(msg, opt) {
     if (msg.length === 0) return "Empty string";
     if (msg[0] === ' ') msg = msg.substr(1);
     if (msg[msg.length-1] === ' ') msg = msg.substr(0,msg.length-1);
+
     var tokens = msg.split(" ");
+    // ideogram support
+    if (hasIdeogram(msg)){
+        var ideograms = /([ \u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d])/;
+        tokens = msg.split(ideograms);
+        // remove empty and whitespace strings
+        tokens = tokens.filter(function(str){ return /\S/.test(str); });
+    }
+
     var count = 0;
     for (var i=0; i<tokens.length; i++){
         var token = tokens[i];
-        //if (token.length === 0) continue;
+        // ideogram support
+        if (isIdeogramPunct(token)) continue;
         if (!isAlphaWithPunct(token) && !isNumericWithPunct(token)
-                && !isEndingPunct(token))
+                && !isEndingPunct(token)
+                // ideogram support
+                && !isIdeogram(token))
             return "Invalid token";
         else if (isEndingPunct(token))
             continue;
         else
             count++;
     }
-    // TODO: incorporate user options
+    // TODO: incorporate full sentence option (instead of max n words)
     // max N words
     if (!(count <= opt.maxWords)) {
         return "Too many tokens";
@@ -238,24 +250,37 @@ function isInvalidPlay(msg, opt) {
 }
 
 function isAlphaWithPunct(str) {
-    return /^[(<'"]*[a-zA-Z&'-]+[.,!?;:)>'"]*$/.test(str);
+    // note \u00C0-\u017F are non-english characters, etc
+    // \u00A1\u00BF are upside down exclamation/question mark
+    // \u201C\u201D are left and right quotation
+    return /^[(<'"\u00A1\u00BF\u201C]*[a-zA-Z\u00C0-\u017F@&'-]+[.,!?;:)>'"\u201D]*$/.test(str);
 }
 
 function isNumericWithPunct(str) {
-    return /^[$-]*[0-9-,.:]+$/.test(str);
+    return /^[$#-]*[0-9-,.:]+(st|nd|rd|th)?$/.test(str);
 }
 
-function isAlpha(str) {
-    return /^[a-zA-Z]+$/.test(str);
-}
-
-function isNumeric(str) {
-    return /^[0-9]+$/.test(str);
-}
 
 function isEndingPunct(str){
-    return /^[.,!?;:)>'"]+$/.test(str);
+    return /^[.,!?;:)>'"\u201D]+$/.test(str);
 }
 
+// Ideograph support: punctuation=\u3000-\u303f
+// ideographic space = \u3000
+// comma = 3001
+// period = 3002
+// ditto = 3003
+// lr brackets = 3008-3011
+// quotes = 301D-301F
+function isIdeogramPunct(str){
+    return /^[\u3001-\u303f]+$/.test(str);
+}
 
+function isIdeogram(str){
+    // test for single ideogram
+    return /^[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]$/.test(str);
+}
 
+function hasIdeogram(str){
+     return /[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]/.test(str);
+}

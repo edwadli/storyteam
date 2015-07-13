@@ -25,11 +25,14 @@ method.undoLast = function(){
 }
 
 function isAlphaWithPunct(str) {
-    return /^[(<'"]*[a-zA-Z&'-]+[.,!?;:)>'"]*$/.test(str);
+    // note \u00C0-\u017F are non-english characters, etc
+    // \u00A1\u00BF are upside down exclamation/question mark
+    // \u201C\u201D are left and right quotation
+    return /^[(<'"\u00A1\u00BF\u201C]*[a-zA-Z\u00C0-\u017F@&'-]+[.,!?;:)>'"\u201D]*$/.test(str);
 }
 
 function isNumericWithPunct(str) {
-    return /^[$-]*[0-9-,.:]+$/.test(str);
+    return /^[$#-]*[0-9-,.:]+(st|nd|rd|th)?$/.test(str);
 }
 
 
