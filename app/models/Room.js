@@ -242,7 +242,7 @@ function isInvalidPlay(msg, opt) {
     // check if final word has ending punct
     var last = tokens[tokens.length-1];
     var lastchar = last[last.length-1];
-    if (isEndingPunct(lastchar))
+    if (isEndingPunct(lastchar) || isIdeogramPunct(lastchar))
         return "Cannot end with punctuation";
 
     // if msg is valid, return null
